@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unidad — IO Campus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    /* ---- Unit page specific extras ---- */
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 12px 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-bottom-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .sidebar-bottom-link:hover {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+    }
+    .content-section-wrapper {
+      animation: fadeInUp 0.35s ease both;
+    }
+    @keyframes fadeInUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+  </style>
+</head>
+<body data-page="unit">
+
+  <div class="unit-page-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <!-- Logo / back to home -->
+        <a href="../index.html" class="sidebar-logo">
+          <div class="sidebar-logo-icon">⚙️</div>
+          IO Campus
+        </a>
+
+        <!-- Section nav for current unit -->
+        <div class="sidebar-section-title">Esta unidad</div>
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-nav-link active" data-section="teoria">
+            <span class="nav-icon">📖</span> Teoría
+          </a>
+          <a href="#" class="sidebar-nav-link" data-section="resumen">
+            <span class="nav-icon">⚡</span> Resumen
+          </a>
+          <a href="#" class="sidebar-nav-link" data-section="formulas">
+            <span class="nav-icon">🔢</span> Fórmulas
+          </a>
+          <a href="#" class="sidebar-nav-link" data-section="casos">
+            <span class="nav-icon">📐</span> Casos Prácticos
+          </a>
+          <a href="#" class="sidebar-nav-link" data-section="flashcards">
+            <span class="nav-icon">🃏</span> Flashcards
+          </a>
+        </nav>
+      </div>
+
+      <!-- All units -->
+      <div class="sidebar-section-title" style="padding-top:8px;">Todas las unidades</div>
+      <div class="sidebar-units" id="unitSidebarList">
+        <!-- Populated by app.js -->
+      </div>
+
+      <!-- Bottom: back link -->
+      <div class="sidebar-bottom">
+        <a href="../index.html" class="sidebar-bottom-link">← Volver al inicio</a>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main-content">
+
+      <!-- Top bar -->
+      <div class="unit-topbar">
+        <div class="unit-topbar-left">
+          <nav class="breadcrumb">
+            <a href="../index.html">IO Campus</a>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current" id="breadcrumbUnit">Unidad</span>
+          </nav>
+        </div>
+        <div class="topbar-actions">
+          <button class="notes-panel-btn" onclick="openNotesPanel()" title="Ver todas mis notas">📚 Mis Notas</button>
+          <button class="edit-mode-btn" id="editModeBtn" onclick="toggleEditMode()">✏️ Modo Edición</button>
+          <button class="save-content-btn" id="saveContentBtn"
+                  onclick="saveContent(window.currentUnit && window.currentUnit.id)">💾 Guardar</button>
+          <button class="mark-done-btn" id="markCompleteBtn">Marcar como completada</button>
+        </div>
+      </div>
+
+      <!-- Unit hero banner -->
+      <div class="unit-hero">
+        <div class="unit-hero-inner">
+          <div class="unit-hero-icon" id="unitIcon">?</div>
+          <div class="unit-hero-text">
+            <div class="unit-hero-eyebrow">Investigación Operativa</div>
+            <h1 class="unit-hero-title" id="unitTitle">Cargando...</h1>
+            <p class="unit-hero-subtitle" id="unitSubtitle"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content sections -->
+      <div class="content-container">
+
+        <!-- TEORIA -->
+        <div class="content-section" id="section-teoria" style="display:block">
+          <div class="content-section-wrapper">
+            <div class="editable-content" id="teoriaContent">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="content-section" id="section-resumen">
+          <div class="content-section-wrapper">
+            <div class="editable-content" id="resumenContent">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- FÓRMULAS -->
+        <div class="content-section" id="section-formulas">
+          <div class="content-section-wrapper">
+            <div class="editable-content" id="formulasContent">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- CASOS PRÁCTICOS -->
+        <div class="content-section" id="section-casos">
+          <div class="content-section-wrapper">
+            <div id="casosContent">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- FLASHCARDS -->
+        <div class="content-section" id="section-flashcards">
+          <div class="content-section-wrapper">
+            <div id="flashcardsContent">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content-container -->
+    </div><!-- /main-content -->
+  </div><!-- /unit-page-layout -->
+
+  <!-- BOT TOGGLE -->
+  <button class="bot-toggle" id="botToggle" title="Asistente IO">🤖</button>
+
+  <!-- BOT PANEL -->
+  <div class="bot-panel" id="botPanel">
+    <div class="bot-header">
+      <div class="bot-header-info">
+        <div class="bot-avatar">🤖</div>
+        <div>
+          <div class="bot-name">Asistente IO</div>
+          <div class="bot-status">Preguntá lo que quieras</div>
+        </div>
+      </div>
+      <button class="bot-close" id="closeBot">✕</button>
+    </div>
+
+    <div class="api-config">
+      <input type="password" id="apiKeyInput" placeholder="Pegar API key de Anthropic aquí...">
+      <span class="api-status" id="apiStatus">🔴 Sin conexión API</span>
+    </div>
+
+    <div class="quick-topics">
+      <button class="quick-topic" data-topic="¿Cómo funciona el Simplex?">Simplex</button>
+      <button class="quick-topic" data-topic="¿Qué es el camino crítico PERT?">PERT</button>
+      <button class="quick-topic" data-topic="¿Cuál es la fórmula EOQ?">Inventarios</button>
+      <button class="quick-topic" data-topic="¿Qué es el modelo M/M/1?">Colas M/M/1</button>
+      <button class="quick-topic" data-topic="¿Cómo funciona la simulación Montecarlo?">Simulación</button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages"></div>
+
+    <div class="chat-input-area">
+      <textarea id="chatInput" placeholder="Preguntá sobre IO..." rows="1"></textarea>
+      <button class="chat-send-btn" id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/content.js"></script>
+  <script src="../js/flashcards.js"></script>
+  <script src="../js/bot.js"></script>
+  <script src="../js/annotations.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IO Campus — Investigación Operativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ---- Landing-specific extras ---- */
+    .landing-features {
+      max-width: 1100px;
+      margin: 0 auto 60px;
+      padding: 0 2rem;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .feature-text h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .feature-text p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+    .landing-footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+    }
+    .landing-footer strong { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body data-page="landing">
+
+  <!-- TOP HEADER -->
+  <header class="landing-header">
+    <div class="header-brand">
+      <div class="header-brand-icon">⚙️</div>
+      <div class="header-brand-text">
+        <span class="header-brand-name">IO Campus</span>
+        <span class="header-brand-sub">Investigación Operativa</span>
+      </div>
+    </div>
+
+    <div class="header-search">
+      <span class="header-search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar en el campus...">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="header-actions">
+      <div class="header-progress-pill">
+        📈 Progreso: <span class="header-progress-num" id="totalProgress">0/8</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="landing-hero">
+    <div class="hero-eyebrow">🎓 Ingeniería Industrial</div>
+    <h1>Investigación<br><span class="hero-accent">Operativa</span></h1>
+    <p>Tu campus de estudio completo: teoría, fórmulas, casos resueltos, flashcards y asistente IA — todo en un solo lugar.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">8</span>
+        <span class="hero-stat-label">Unidades</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">100h</span>
+        <span class="hero-stat-label">de contenido</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">90+</span>
+        <span class="hero-stat-label">Flashcards</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">30</span>
+        <span class="hero-stat-label">Casos resueltos</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-overview">
+    <div class="progress-card">
+      <span class="progress-label">Tu progreso</span>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="totalProgressBar"></div>
+      </div>
+      <span class="progress-pct" id="totalProgressText">0% completado</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="landing-features" style="margin-top: 40px; margin-bottom: 0;">
+    <div class="section-header">
+      <h2 class="section-title">¿Qué encontrás en el campus?</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#dbeafe;">📖</div>
+        <div class="feature-text">
+          <h4>Teoría Completa</h4>
+          <p>Explicaciones detalladas, tablas, diagramas y ejemplos para cada unidad.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fef3c7;">⚡</div>
+        <div class="feature-text">
+          <h4>Fórmulas Clave</h4>
+          <p>Todas las fórmulas destacadas en cajas doradas, fáciles de memorizar.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#d1fae5;">🃏</div>
+        <div class="feature-text">
+          <h4>Flashcards</h4>
+          <p>75+ tarjetas con animación de volteo, calificación y modo examen global.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#ede9fe;">📐</div>
+        <div class="feature-text">
+          <h4>Casos Resueltos</h4>
+          <p>Problemas completos con resolución paso a paso para cada tema.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fce7f3;">🤖</div>
+        <div class="feature-text">
+          <h4>Asistente IA</h4>
+          <p>Bot pre-programado con respuestas sobre todos los temas. Conectá tu API key de Claude para respuestas personalizadas.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#ffedd5;">✏️</div>
+        <div class="feature-text">
+          <h4>Editor de Notas</h4>
+          <p>Modo edición para personalizar el contenido y guardarlo localmente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP / UNITS GRID -->
+  <main class="roadmap-section">
+    <div class="section-header">
+      <h2 class="section-title">Plan de Estudio</h2>
+      <span class="section-subtitle">Hacé clic en una unidad para comenzar</span>
+    </div>
+    <div class="units-grid" id="unitsGrid">
+      <!-- Populated by app.js -->
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="landing-footer">
+    <strong>IO Campus</strong> — Investigación Operativa · Ingeniería Industrial ·
+    Contenido académico para uso educativo
+  </footer>
+
+  <!-- BOT TOGGLE -->
+  <button class="bot-toggle" id="botToggle" title="Asistente IO">🤖</button>
+
+  <!-- BOT PANEL -->
+  <div class="bot-panel" id="botPanel">
+    <div class="bot-header">
+      <div class="bot-header-info">
+        <div class="bot-avatar">🤖</div>
+        <div>
+          <div class="bot-name">Asistente IO</div>
+          <div class="bot-status">Siempre disponible</div>
+        </div>
+      </div>
+      <button class="bot-close" id="closeBot">✕</button>
+    </div>
+
+    <!-- API Config -->
+    <div class="api-config">
+      <input type="password" id="apiKeyInput" placeholder="Pegar API key de Anthropic aquí...">
+      <span class="api-status" id="apiStatus">🔴 Sin conexión API</span>
+    </div>
+
+    <!-- Quick topics -->
+    <div class="quick-topics">
+      <button class="quick-topic" data-topic="¿Cómo funciona el Simplex?">Simplex</button>
+      <button class="quick-topic" data-topic="¿Qué es el camino crítico PERT?">PERT</button>
+      <button class="quick-topic" data-topic="¿Cuál es la fórmula EOQ?">Inventarios</button>
+      <button class="quick-topic" data-topic="¿Qué es el modelo M/M/1?">Colas M/M/1</button>
+      <button class="quick-topic" data-topic="¿Cómo funciona la simulación Montecarlo?">Simulación</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages"></div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <textarea id="chatInput" placeholder="Preguntá sobre IO..." rows="1"></textarea>
+      <button class="chat-send-btn" id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/content.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script src="js/bot.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
