@@ -518,13 +518,14 @@ async function sendToAI(userText, attachment) {
   await ensurePuter();
   if (!window.puter) throw new Error('Puter no disponible — recargá la página (Ctrl+Shift+R).');
 
-  const sys = buildSystemPrompt();
+  const isImage = attachment?.type === 'image';
+  const sys = buildSystemPrompt(isImage);
 
   let userContent;
-  if (attachment?.type === 'image') {
+  if (isImage) {
     const img = await compressImage(attachment.content);
     userContent = [
-      { type: 'text', text: (userText || 'Describí e interpretá esta imagen en contexto de Investigación Operativa.') + `\n\n(Sistema: ${sys})` },
+      { type: 'text', text: `[${sys}]\n\n${userText || 'Describí e interpretá esta imagen en contexto de Investigación Operativa.'}` },
       { type: 'image_url', image_url: { url: img } }
     ];
   } else {
@@ -577,9 +578,21 @@ function extractText(r) {
   return String(r);
 }
 
-function buildSystemPrompt() {
+function buildSystemPrompt(hasImage = false) {
   const unit = document.getElementById('unitTitle')?.textContent?.trim() || 'IO';
-  return `Sos tutor de Investigación Operativa para ingeniería industrial argentina. Respondés en español rioplatense, claro y conciso. Respondés cualquier pregunta, no solo de IO. Para ejercicios Simplex usás tablas HTML con clases simplex-table/cj-row/header-row/z-row/pivot. Unidad actual: ${unit}.`;
+
+  const base = `Sos tutor de Investigación Operativa para ingeniería industrial argentina. Respondés en español rioplatense, conciso y claro. Respondés cualquier pregunta, no solo de IO. Para ejercicios Simplex usás tablas HTML con clases simplex-table/cj-row/header-row/z-row/pivot (columnas: ck|xk|Bk|variables|bi/aij, fila Z con zj-cj). Unidad actual: ${unit}.`;
+
+  if (hasImage) return base; // imagen ya aporta contexto visual — prompt corto
+
+  // Detectar sección activa y extraer su contenido
+  const activeTab   = document.querySelector('.content-tab.active')?.dataset?.section || 'teoria';
+  const sectionMap  = { teoria: 'teoriaContent', resumen: 'resumenContent', formulas: 'formulasContent', casos: 'casosContent' };
+  const sectionEl   = document.getElementById(sectionMap[activeTab] || 'teoriaContent');
+  const sectionText = sectionEl?.innerText?.replace(/\s+/g, ' ').trim().slice(0, 2500) || '';
+
+  if (!sectionText) return base;
+  return `${base}\n\nContenido de la guía (sección "${activeTab}" — ${unit}):\n${sectionText}`;
 }
 
 // ---- Fallback offline ----
