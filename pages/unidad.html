@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
+  <script src="https://js.puter.com/v2/"></script>
   <style>
     /* ---- Unit page specific extras ---- */
     .sidebar-bottom {
@@ -37,6 +38,234 @@
       from { opacity:0; transform:translateY(12px); }
       to   { opacity:1; transform:translateY(0); }
     }
+    /* ---- Videos section ---- */
+    .videos-intro { margin-bottom: 24px; }
+    .videos-intro h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .videos-intro p { color: var(--text-2); font-size: 14px; }
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 10px;
+    }
+    .video-card-link { text-decoration: none; }
+    .video-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      transition: all 0.18s;
+    }
+    .video-card:hover {
+      border-color: var(--unit-accent, #8b5cf6);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    .video-card-thumb {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      background: var(--unit-accent, #8b5cf6);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .video-card-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .video-card-num { font-size: 11px; color: var(--text-2); font-weight: 600; }
+    .video-card-title { font-size: 13px; font-weight: 600; color: var(--text-1); line-height: 1.4; }
+
+    /* ---- Simplex table (rendered in bot chat) ---- */
+    .simplex-table {
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 8px 0;
+      font-family: monospace;
+      display: block;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+    .simplex-table td {
+      border: 1px solid #ccc;
+      padding: 4px 10px;
+      text-align: center;
+      min-width: 36px;
+      white-space: nowrap;
+    }
+    .simplex-table .cj-row td    { background: #e8f0fe; font-size: 11px; color: #555; }
+    .simplex-table .header-row td{ background: #f0f0f0; font-weight: 700; }
+    .simplex-table .z-row td     { background: #fef3c7; font-weight: 700; }
+    .simplex-table .pivot        { background: #dcfce7 !important; outline: 2px solid #16a34a; font-weight: 700; }
+
+    /* ---- Open viewer button inside chat ---- */
+    .open-viewer-btn {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 14px;
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .open-viewer-btn:hover { background: #7c3aed; }
+
+    /* ---- Capture button ---- */
+    .capture-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .capture-btn:hover { opacity: 1; }
+
+    /* ---- PDF Viewer Modal ---- */
+    #pdfViewerModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+    }
+    .pv-inner  { display: flex; flex-direction: column; height: 100%; }
+    .pv-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: #1e1e2e;
+      color: white;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .pv-tb-left  { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+    .pv-tb-center{ display:flex; gap:6px; }
+    .pv-tb-right { margin-left:auto; }
+    .pv-filename { font-size:13px; color:#ccc; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pv-pages    { font-size:12px; color:#aaa; white-space:nowrap; }
+    .pv-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      border-radius: 6px;
+      padding: 5px 11px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .pv-btn:hover      { background: rgba(255,255,255,0.2); }
+    .pv-btn.active     { background: #8b5cf6; border-color: #8b5cf6; }
+    .pv-close-btn      { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.4); }
+    .pv-close-btn:hover{ background: rgba(239,68,68,0.55); }
+    .pv-hint {
+      padding: 7px 16px;
+      background: #2a2a3e;
+      color: #c4b5fd;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .pv-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #252535;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pv-page-label {
+      position: absolute;
+      bottom: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #aaa;
+      white-space: nowrap;
+    }
+    .pv-page { margin-bottom: 36px !important; }
+    .pv-note-el {
+      position: absolute;
+      background: #fef9c3;
+      border: 1px solid #eab308;
+      border-radius: 5px;
+      padding: 4px;
+      min-width: 160px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      z-index: 20;
+      pointer-events: all;
+    }
+    .pv-note-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      padding: 2px 4px;
+      background: #fde047;
+      border-radius: 3px 3px 0 0;
+      margin: -4px -4px 4px;
+      font-size: 12px;
+      user-select: none;
+    }
+    .pv-note-del {
+      background: none; border: none; cursor: pointer;
+      font-size: 11px; padding: 0 2px; line-height:1;
+    }
+    .pv-note-ta {
+      width: 100%; min-height: 55px; border: none;
+      background: transparent; font-size: 12px;
+      resize: both; font-family: inherit;
+    }
+
+    /* ---- Attachment UI ---- */
+    .attachment-preview {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(139, 92, 246, 0.08);
+      border-top: 1px solid rgba(139, 92, 246, 0.18);
+      font-size: 12px;
+      color: #8b5cf6;
+    }
+    .attachment-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .attachment-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      padding: 0 4px;
+      opacity: 0.7;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .attachment-remove:hover { opacity: 1; }
+    .attach-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .attach-btn:hover { opacity: 1; }
   </style>
 </head>
 <body data-page="unit">
@@ -69,6 +298,9 @@
           </a>
           <a href="#" class="sidebar-nav-link" data-section="flashcards">
             <span class="nav-icon">🃏</span> Flashcards
+          </a>
+          <a href="#" class="sidebar-nav-link" data-section="videos">
+            <span class="nav-icon">🎬</span> Videos
           </a>
         </nav>
       </div>
@@ -116,6 +348,16 @@
             <p class="unit-hero-subtitle" id="unitSubtitle"></p>
           </div>
         </div>
+      </div>
+
+      <!-- Section tabs (always visible) -->
+      <div class="content-tabs" id="contentTabs">
+        <button class="content-tab active" data-section="teoria"    onclick="navigateSection('teoria')">📖 Teoría</button>
+        <button class="content-tab"        data-section="resumen"   onclick="navigateSection('resumen')">⚡ Resumen</button>
+        <button class="content-tab"        data-section="formulas"  onclick="navigateSection('formulas')">🔢 Fórmulas</button>
+        <button class="content-tab"        data-section="casos"     onclick="navigateSection('casos')">📐 Casos Prácticos</button>
+        <button class="content-tab"        data-section="flashcards" onclick="navigateSection('flashcards')">🃏 Flashcards</button>
+        <button class="content-tab"        data-section="videos"    onclick="navigateSection('videos')">🎬 Videos</button>
       </div>
 
       <!-- Content sections -->
@@ -166,6 +408,15 @@
           </div>
         </div>
 
+        <!-- VIDEOS -->
+        <div class="content-section" id="section-videos">
+          <div class="content-section-wrapper">
+            <div id="videosContent">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
       </div><!-- /content-container -->
     </div><!-- /main-content -->
   </div><!-- /unit-page-layout -->
@@ -186,11 +437,6 @@
       <button class="bot-close" id="closeBot">✕</button>
     </div>
 
-    <div class="api-config">
-      <input type="password" id="apiKeyInput" placeholder="Pegar API key de Anthropic aquí...">
-      <span class="api-status" id="apiStatus">🔴 Sin conexión API</span>
-    </div>
-
     <div class="quick-topics">
       <button class="quick-topic" data-topic="¿Cómo funciona el Simplex?">Simplex</button>
       <button class="quick-topic" data-topic="¿Qué es el camino crítico PERT?">PERT</button>
@@ -201,8 +447,16 @@
 
     <div class="chat-messages" id="chatMessages"></div>
 
+    <div class="attachment-preview" id="attachmentPreview">
+      <span class="attachment-name" id="attachmentName"></span>
+      <button class="attachment-remove" id="attachmentRemove">✕</button>
+    </div>
+
     <div class="chat-input-area">
-      <textarea id="chatInput" placeholder="Preguntá sobre IO..." rows="1"></textarea>
+      <button class="attach-btn"   id="attachBtn"   title="Adjuntar PDF o imagen">📎</button>
+      <button class="capture-btn"  id="captureBtn"  title="Capturar área de la guía y mandársela al bot">📸</button>
+      <input type="file" id="fileInput" accept=".pdf,image/*" style="display:none">
+      <textarea id="chatInput" placeholder="Preguntá sobre IO, pegá un link de video..." rows="1"></textarea>
       <button class="chat-send-btn" id="sendBtn">➤</button>
     </div>
   </div>
@@ -211,6 +465,7 @@
   <script src="../js/content.js"></script>
   <script src="../js/flashcards.js"></script>
   <script src="../js/bot.js"></script>
+  <script src="../js/pdfviewer.js"></script>
   <script src="../js/annotations.js"></script>
   <script src="../js/app.js"></script>
 </body>

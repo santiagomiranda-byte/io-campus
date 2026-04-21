@@ -1,5 +1,5 @@
 // ============================================================
-// bot.js — Pre-programmed bot + Claude API integration
+// bot.js — AI bot with Puter.js (gratis, sin API key) + adjuntos
 // ============================================================
 
 const BOT_RESPONSES = [
@@ -148,191 +148,394 @@ Si el precio sombra de un recurso es 0 → el recurso no es restrictivo (tiene h
   }
 ];
 
-const DEFAULT_RESPONSE = `No encontré una respuesta específica para esa pregunta.
+const DEFAULT_RESPONSE = `No encontré información específica para esa pregunta.
 
 **Podés intentar:**
-- Preguntar sobre: Simplex, PERT, EOQ, M/M/1, Montecarlo, Branch and Bound, Dualidad
-- Usar las preguntas rápidas abajo
-- Revisar la sección de **Fórmulas** de cada unidad
-- Consultar los **Casos Prácticos** resueltos
+- Reformular con más detalle
+- Adjuntar tu guía como **PDF** usando el clip 📎
+- Subir una **imagen** de un ejercicio o cuadro
+- Usar los botones rápidos abajo`;
 
-Si tenés una API key de Anthropic, ingresála arriba para obtener respuestas personalizadas de Claude IA.`;
-
-// ---- Bot State ----
-let apiKey = '';
-let isConnected = false;
+// ---- State ----
 let conversationHistory = [];
+let pendingAttachment = null;
 
-// ---- DOM References ----
+// ---- DOM ----
 let chatMessages, chatInput, sendBtn, botPanel, botToggle;
-let apiKeyInput, apiStatus;
+let fileInput, attachBtn, attachmentPreview, attachmentNameEl;
 
-// ---- Initialize Bot ----
+// ---- Init ----
 function initBot() {
-  chatMessages = document.getElementById('chatMessages');
-  chatInput = document.getElementById('chatInput');
-  sendBtn = document.getElementById('sendBtn');
-  botPanel = document.getElementById('botPanel');
-  botToggle = document.getElementById('botToggle');
-  apiKeyInput = document.getElementById('apiKeyInput');
-  apiStatus = document.getElementById('apiStatus');
+  chatMessages     = document.getElementById('chatMessages');
+  chatInput        = document.getElementById('chatInput');
+  sendBtn          = document.getElementById('sendBtn');
+  botPanel         = document.getElementById('botPanel');
+  botToggle        = document.getElementById('botToggle');
+  fileInput        = document.getElementById('fileInput');
+  attachBtn        = document.getElementById('attachBtn');
+  attachmentPreview = document.getElementById('attachmentPreview');
+  attachmentNameEl  = document.getElementById('attachmentName');
 
   if (!chatMessages) return;
 
-  // Event listeners
   sendBtn.addEventListener('click', handleSend);
   chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   });
+  chatInput.addEventListener('input', autoResize);
+  chatInput.addEventListener('paste', handlePaste);
 
   botToggle.addEventListener('click', toggleBot);
   document.getElementById('closeBot').addEventListener('click', () => {
     botPanel.classList.remove('open');
   });
 
-  // API Key listener
-  if (apiKeyInput) {
-    apiKeyInput.addEventListener('input', handleApiKeyChange);
-  }
+  if (attachBtn) attachBtn.addEventListener('click', () => fileInput && fileInput.click());
+  if (fileInput) fileInput.addEventListener('change', handleFileSelect);
+  const removeBtn = document.getElementById('attachmentRemove');
+  if (removeBtn) removeBtn.addEventListener('click', clearAttachment);
 
-  // Quick topic buttons
+  const captureBtn = document.getElementById('captureBtn');
+  if (captureBtn) captureBtn.addEventListener('click', startCapture);
+
   document.querySelectorAll('.quick-topic').forEach(btn => {
     btn.addEventListener('click', () => {
-      const topic = btn.dataset.topic;
-      chatInput.value = topic;
+      chatInput.value = btn.dataset.topic;
       handleSend();
     });
   });
 
-  // Welcome message
   setTimeout(() => {
     addMessage('bot', `¡Hola! Soy tu asistente de **Investigación Operativa**.
 
-Podés preguntarme sobre:
-- Simplex y Programación Lineal
-- PERT/CPM y camino crítico
-- Inventarios y EOQ
-- Teoría de Colas M/M/1
-- Simulación Montecarlo
+Podés:
+- Preguntarme sobre **cualquier tema** de IO o lo que necesites
+- Adjuntar tu **guía en PDF** con el clip 📎
+- Subir una **imagen** de un ejercicio o cuadro
+- Pegar un **link de YouTube** para referenciarlo
 
-¿Qué querés repasar hoy?`);
+La primera vez que uses la IA te va a pedir crear una cuenta gratuita en Puter. ¿Qué querés repasar hoy?`);
   }, 500);
+}
+
+function autoResize() {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
 }
 
 function toggleBot() {
   botPanel.classList.toggle('open');
 }
 
-function handleApiKeyChange() {
-  const key = apiKeyInput.value.trim();
-  if (key.startsWith('sk-ant-') && key.length > 20) {
-    apiKey = key;
-    isConnected = true;
-    apiStatus.textContent = '🟢 Conectado a Claude';
-    apiStatus.className = 'api-status connected';
-  } else if (key.length === 0) {
-    apiKey = '';
-    isConnected = false;
-    apiStatus.textContent = '🔴 Sin conexión API';
-    apiStatus.className = 'api-status';
-  } else {
-    apiKey = '';
-    isConnected = false;
-    apiStatus.textContent = '🟡 API key inválida';
-    apiStatus.className = 'api-status warning';
+// ---- File / attachment handling ----
+async function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  fileInput.value = '';
+
+  if (file.type === 'application/pdf') {
+    showAttachmentPreview('📄 ' + file.name, 'Extrayendo texto...');
+    try {
+      const { text, totalPages } = await extractPdfText(file);
+      pendingAttachment = { type: 'pdf', name: file.name, content: text };
+      const label = totalPages > 20
+        ? `${totalPages} págs — solo primeras 20 para el bot`
+        : Math.ceil(text.length / 1000) + 'k caracteres';
+      showAttachmentPreview('📄 ' + file.name, label);
+
+      if (totalPages > 20) {
+        window._lastPdfFile = file;
+        addMessage('bot',
+          `⚠️ Este PDF tiene **${totalPages} páginas**. Para el bot solo voy a usar las primeras 20 — el resto no lo va a considerar.\n\nSi querés leer el PDF completo con **subrayado y notas**, abrilo en el visor integrado: <button class="open-viewer-btn" onclick="window.pdfViewer && window.pdfViewer.open(window._lastPdfFile)">📖 Abrir visor completo</button>`
+        );
+      }
+    } catch {
+      pendingAttachment = { type: 'pdf', name: file.name, content: `[Archivo PDF: ${file.name}]` };
+      showAttachmentPreview('📄 ' + file.name);
+    }
+  } else if (file.type.startsWith('image/')) {
+    const base64 = await readAsBase64(file);
+    pendingAttachment = { type: 'image', name: file.name, content: base64 };
+    showAttachmentPreview('🖼️ ' + file.name);
   }
 }
 
-async function handleSend() {
-  const message = chatInput.value.trim();
-  if (!message) return;
+function handlePaste(e) {
+  const text = e.clipboardData.getData('text');
+  const video = detectVideoUrl(text);
+  if (video) {
+    e.preventDefault();
+    pendingAttachment = { type: 'video', name: video.title, url: video.url };
+    showAttachmentPreview('🎬 ' + video.title);
+  }
+}
 
-  addMessage('user', message);
+function detectVideoUrl(text) {
+  const trimmed = text.trim();
+  const ytMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) return { url: trimmed, title: 'YouTube video' };
+  if (trimmed.match(/^https?:\/\/.+\.(mp4|webm|mov)/i)) return { url: trimmed, title: trimmed };
+  return null;
+}
+
+function showAttachmentPreview(name, subtitle) {
+  if (!attachmentPreview || !attachmentNameEl) return;
+  attachmentPreview.style.display = 'flex';
+  attachmentNameEl.textContent = name + (subtitle ? ' — ' + subtitle : '');
+}
+
+function clearAttachment() {
+  pendingAttachment = null;
+  if (attachmentPreview) attachmentPreview.style.display = 'none';
+  if (attachmentNameEl) attachmentNameEl.textContent = '';
+}
+
+// ---- PDF extraction (lazy-load pdf.js) ----
+async function extractPdfText(file) {
+  if (!window.pdfjsLib) {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const totalPages = pdf.numPages;
+  const maxPages = Math.min(totalPages, 20);
+  const texts = [];
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    texts.push(content.items.map(item => item.str).join(' '));
+  }
+  return { text: texts.join('\n\n'), totalPages };
+}
+
+// ---- Screen region capture ----
+function startCapture() {
+  if (!window.html2canvas) {
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
+      .then(doCapture).catch(() => addMessage('bot', '⚠️ No se pudo cargar el capturador.'));
+  } else {
+    doCapture();
+  }
+}
+
+function doCapture() {
+  const overlay = document.createElement('div');
+  overlay.id = 'captureOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;cursor:crosshair;background:rgba(0,0,0,0.15);';
+  overlay.title = 'Arrastrá para seleccionar el área a capturar. ESC para cancelar.';
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#1e1e2e;color:white;padding:8px 18px;border-radius:20px;font-size:13px;z-index:100000;pointer-events:none;';
+  hint.textContent = 'Arrastrá para capturar un área de la guía — ESC para cancelar';
+  document.body.appendChild(hint);
+
+  let startX, startY, selBox;
+
+  const rect2 = (x, y, w, h) => {
+    if (!selBox) {
+      selBox = document.createElement('div');
+      selBox.style.cssText = 'position:fixed;border:2px solid #8b5cf6;background:rgba(139,92,246,0.1);z-index:100001;pointer-events:none;';
+      document.body.appendChild(selBox);
+    }
+    selBox.style.left   = Math.min(x, x + w) + 'px';
+    selBox.style.top    = Math.min(y, y + h) + 'px';
+    selBox.style.width  = Math.abs(w) + 'px';
+    selBox.style.height = Math.abs(h) + 'px';
+  };
+
+  const cleanup = () => {
+    overlay.remove();
+    hint.remove();
+    selBox?.remove();
+    document.removeEventListener('keydown', onKey);
+  };
+
+  const onKey = (e) => { if (e.key === 'Escape') cleanup(); };
+  document.addEventListener('keydown', onKey);
+
+  overlay.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    overlay.addEventListener('mousemove', onMove);
+    overlay.addEventListener('mouseup', onUp, { once: true });
+  });
+
+  const onMove = (e) => rect2(startX, startY, e.clientX - startX, e.clientY - startY);
+
+  const onUp = async (e) => {
+    overlay.removeEventListener('mousemove', onMove);
+    cleanup();
+
+    const x = Math.min(startX, e.clientX);
+    const y = Math.min(startY, e.clientY);
+    const w = Math.abs(e.clientX - startX);
+    const h = Math.abs(e.clientY - startY);
+
+    if (w < 20 || h < 20) return;
+
+    try {
+      const canvas = await html2canvas(document.body, {
+        x: x + window.scrollX,
+        y: y + window.scrollY,
+        width: w,
+        height: h,
+        scale: window.devicePixelRatio || 1,
+        useCORS: true,
+        logging: false
+      });
+      const base64 = canvas.toDataURL('image/png');
+      pendingAttachment = { type: 'image', name: 'captura-pantalla.png', content: base64 };
+      showAttachmentPreview('📸 Captura de pantalla');
+      botPanel.classList.add('open');
+      chatInput.focus();
+    } catch {
+      addMessage('bot', '⚠️ No se pudo capturar la imagen.');
+    }
+  };
+
+  document.body.appendChild(overlay);
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function readAsBase64(file) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.readAsDataURL(file);
+  });
+}
+
+// ---- Send message ----
+async function handleSend() {
+  const userText = chatInput.value.trim();
+  if (!userText && !pendingAttachment) return;
+
+  let displayText = userText;
+  if (pendingAttachment) {
+    const icon = { pdf: '📄', image: '🖼️', video: '🎬' }[pendingAttachment.type] || '📎';
+    if (displayText) displayText += '\n';
+    displayText += icon + ' ' + pendingAttachment.name;
+  }
+  addMessage('user', displayText || '[adjunto]');
+
   chatInput.value = '';
+  chatInput.style.height = 'auto';
   sendBtn.disabled = true;
 
-  // Show typing indicator
-  const typingId = showTyping();
+  const attachment = pendingAttachment;
+  clearAttachment();
 
+  const typingId = showTyping();
   try {
-    let response;
-    if (isConnected && apiKey) {
-      response = await sendToClaude(message, apiKey);
-    } else {
-      // Simulate a small delay for realism
-      await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
-      response = getPreProgrammedResponse(message);
-    }
+    const response = await sendToAI(userText, attachment);
     removeTyping(typingId);
     addMessage('bot', response);
   } catch (err) {
     removeTyping(typingId);
-    if (err.message && err.message.includes('API')) {
-      addMessage('bot', `⚠️ Error al conectar con Claude API: ${err.message}\n\nUsando respuestas pre-programadas...`);
-      const fallback = getPreProgrammedResponse(message);
-      addMessage('bot', fallback);
-    } else {
-      addMessage('bot', `⚠️ Ocurrió un error. ${DEFAULT_RESPONSE}`);
-    }
+    console.warn('AI error, usando fallback:', err);
+    addMessage('bot', userText ? getPreProgrammedResponse(userText) : DEFAULT_RESPONSE);
   } finally {
     sendBtn.disabled = false;
   }
 }
 
+// ---- Puter.js AI ----
+async function sendToAI(userText, attachment) {
+  if (!window.puter) throw new Error('puter no disponible');
+
+  let userContent;
+
+  if (attachment?.type === 'image') {
+    userContent = [
+      { type: 'text', text: userText || 'Analizá esta imagen en el contexto de Investigación Operativa.' },
+      { type: 'image_url', image_url: { url: attachment.content } }
+    ];
+  } else {
+    let text = userText || '';
+    if (attachment?.type === 'pdf') {
+      text += `\n\n[Contenido del PDF "${attachment.name}"]\n${attachment.content.slice(0, 8000)}`;
+    } else if (attachment?.type === 'video') {
+      text += `\n\n[El alumno adjuntó este video: ${attachment.url}]`;
+    }
+    userContent = text.trim();
+  }
+
+  conversationHistory.push({ role: 'user', content: userContent });
+
+  const messages = [
+    { role: 'system', content: buildSystemPrompt() },
+    ...conversationHistory
+  ];
+
+  const result = await puter.ai.chat(messages);
+  const text = extractText(result);
+
+  conversationHistory.push({ role: 'assistant', content: text });
+  if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-16);
+
+  return text;
+}
+
+function extractText(response) {
+  if (typeof response === 'string') return response;
+  if (response?.message?.content) {
+    const c = response.message.content;
+    if (typeof c === 'string') return c;
+    if (Array.isArray(c)) return c.map(p => p.text || '').join('');
+  }
+  if (response?.choices?.[0]?.message?.content) return response.choices[0].message.content;
+  if (response?.content?.[0]?.text) return response.content[0].text;
+  return String(response);
+}
+
+function buildSystemPrompt() {
+  const unitTitle    = document.getElementById('unitTitle')?.textContent?.trim() || '';
+  const teoriaText   = document.getElementById('teoriaContent')?.innerText?.trim().slice(0, 3000) || '';
+  const formulasText = document.getElementById('formulasContent')?.innerText?.trim().slice(0, 1500) || '';
+
+  return `Sos un asistente inteligente y tutor de Investigación Operativa para ingeniería industrial en Argentina.
+Respondés siempre en español rioplatense (vos, te, etc.), de forma clara y concisa.
+Podés responder cualquier pregunta general, no solo de IO: comportate como una IA de propósito general.
+Si el alumno adjunta un PDF, analizá su contenido en detalle y respondé en base a él.
+Si adjunta una imagen o screenshot, describí e interpretá lo que ves con detalle, identificando ejercicios, tablas, fórmulas o conceptos visibles.
+Si menciona un video, reconocelo y respondé con lo que podés inferir.
+
+FORMATO DE TABLA SIMPLEX — Cuando resolvés ejercicios de Simplex o Programación Lineal, SIEMPRE usás tablas HTML con exactamente esta estructura:
+<table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>[c1]</td><td>[c2]</td><td>...</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>[var1]</td><td>[var2]</td><td>...</td><td>bi/aij</td></tr>
+  <tr><td>[ck]</td><td>[xk]</td><td>[Bk]</td><td>[a11]</td><td>[a12]</td><td>...</td><td>[ratio]</td></tr>
+  <tr class="z-row"><td colspan="2">Z=[valor]</td><td></td><td>[zj-cj1]</td><td>[zj-cj2]</td><td>...</td><td>zj-cj</td></tr>
+</table>
+Marcás la celda pivote con class="pivot". Si hay múltiples iteraciones, generás una tabla por iteración. Explicás brevemente qué hiciste entre iteraciones.
+
+Unidad actual: ${unitTitle || 'Investigación Operativa'}
+Unidades del curso: 1. Intro a IO | 2. Programación Lineal | 3. Prog. Entera/Extensiones | 4. PERT/CPM | 5. Inventarios | 6. Teoría de Colas | 7. Simulación
+${teoriaText   ? '\nContenido de la guía (teoría):\n' + teoriaText   : ''}
+${formulasText ? '\nFórmulas de la unidad:\n'          + formulasText : ''}`;
+}
+
+// ---- Fallback offline ----
 function getPreProgrammedResponse(message) {
   const lower = message.toLowerCase();
-
   for (const entry of BOT_RESPONSES) {
-    if (entry.keywords.some(kw => lower.includes(kw))) {
-      return entry.response;
-    }
+    if (entry.keywords.some(kw => lower.includes(kw))) return entry.response;
   }
   return DEFAULT_RESPONSE;
 }
 
-async function sendToClaude(message, key) {
-  conversationHistory.push({ role: 'user', content: message });
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      system: `Eres un tutor experto en Investigación Operativa para ingeniería industrial.
-Respondés en español argentino, de forma clara y concisa.
-Usás fórmulas matemáticas cuando es necesario (formato texto simple).
-Estructurás tus respuestas con listas y negritas cuando ayuda a la comprensión.
-Nunca respondés en inglés a menos que sea terminología técnica necesaria.
-El contexto es una materia universitaria de ingeniería industrial con estas unidades:
-1. Introducción a IO, 2. Programación Lineal, 3. Prog. Entera/Extensiones,
-4. PERT/CPM, 5. Inventarios, 6. Teoría de Colas, 7. Simulación.`,
-      messages: conversationHistory
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Error desconocido'}`);
-  }
-
-  const data = await response.json();
-  const assistantMessage = data.content[0].text;
-  conversationHistory.push({ role: 'assistant', content: assistantMessage });
-
-  // Keep conversation history manageable
-  if (conversationHistory.length > 20) {
-    conversationHistory = conversationHistory.slice(-16);
-  }
-
-  return assistantMessage;
-}
-
+// ---- UI helpers ----
 function addMessage(role, text) {
   const div = document.createElement('div');
   div.className = `chat-message ${role}`;
@@ -351,9 +554,7 @@ function showTyping() {
   div.id = id;
   div.innerHTML = `
     <div class="message-avatar">🤖</div>
-    <div class="message-bubble typing">
-      <span></span><span></span><span></span>
-    </div>
+    <div class="message-bubble typing"><span></span><span></span><span></span></div>
   `;
   chatMessages.appendChild(div);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -361,12 +562,10 @@ function showTyping() {
 }
 
 function removeTyping(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
+  document.getElementById(id)?.remove();
 }
 
 function formatBotMessage(text) {
-  // Convert markdown-like syntax to HTML
   return text
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
@@ -382,6 +581,5 @@ function formatBotMessage(text) {
     .replace(/(<\/[hul][^>]*>)<\/p>/g, '$1');
 }
 
-// Export for global access
 window.initBot = initBot;
 window.toggleBot = toggleBot;
