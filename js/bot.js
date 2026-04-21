@@ -496,81 +496,90 @@ async function handleSend() {
   }
 }
 
+// ---- Image compression ----
+function compressImage(dataUrl, maxW = 900) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const ratio = Math.min(1, maxW / img.width);
+      const c = document.createElement('canvas');
+      c.width  = Math.round(img.width  * ratio);
+      c.height = Math.round(img.height * ratio);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.72));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 // ---- Puter.js AI ----
 async function sendToAI(userText, attachment) {
   await ensurePuter();
-  if (!window.puter) throw new Error('La IA (Puter) no está disponible. Recargá la página con Ctrl+Shift+R y permitir popups si te lo pide.');
+  if (!window.puter) throw new Error('Puter no disponible — recargá la página (Ctrl+Shift+R).');
+
+  const sys = buildSystemPrompt();
 
   let userContent;
-
   if (attachment?.type === 'image') {
+    const img = await compressImage(attachment.content);
     userContent = [
-      { type: 'text', text: userText || 'Analizá esta imagen en el contexto de Investigación Operativa.' },
-      { type: 'image_url', image_url: { url: attachment.content } }
+      { type: 'text', text: (userText || 'Describí e interpretá esta imagen en contexto de Investigación Operativa.') + `\n\n(Sistema: ${sys})` },
+      { type: 'image_url', image_url: { url: img } }
     ];
   } else {
     let text = userText || '';
-    if (attachment?.type === 'pdf') {
-      text += `\n\n[Contenido del PDF "${attachment.name}"]\n${attachment.content.slice(0, 8000)}`;
-    } else if (attachment?.type === 'video') {
-      text += `\n\n[El alumno adjuntó este video: ${attachment.url}]`;
-    }
+    if (attachment?.type === 'pdf') text += `\n\n[PDF: ${attachment.name}]\n${attachment.content.slice(0, 3000)}`;
+    if (attachment?.type === 'video') text += `\n\n[Video adjunto: ${attachment.url}]`;
     userContent = text.trim();
   }
 
   conversationHistory.push({ role: 'user', content: userContent });
 
-  const messages = [
-    { role: 'system', content: buildSystemPrompt() },
-    ...conversationHistory
-  ];
+  // Keep history short — last 3 exchanges max
+  const recent = conversationHistory.slice(-6);
 
-  const result = await puter.ai.chat(messages);
+  // Build messages — inject system as first user message prefix if no image
+  let messages;
+  if (attachment?.type === 'image') {
+    messages = recent;
+  } else {
+    const withSys = recent.map((m, i) => {
+      if (i === 0 && m.role === 'user') {
+        return { role: 'user', content: `[Instrucciones: ${sys}]\n\n${m.content}` };
+      }
+      return m;
+    });
+    messages = withSys;
+  }
+
+  // 30-second timeout
+  const result = await Promise.race([
+    puter.ai.chat(messages),
+    new Promise((_, rej) => setTimeout(() =>
+      rej(new Error('La IA tardó demasiado (30s). Intentá de nuevo — la primera respuesta suele tardar más.')), 30000))
+  ]);
+
   const text = extractText(result);
-
   conversationHistory.push({ role: 'assistant', content: text });
-  if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-16);
-
+  if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-10);
   return text;
 }
 
-function extractText(response) {
-  if (typeof response === 'string') return response;
-  if (response?.message?.content) {
-    const c = response.message.content;
-    if (typeof c === 'string') return c;
-    if (Array.isArray(c)) return c.map(p => p.text || '').join('');
+function extractText(r) {
+  if (typeof r === 'string') return r;
+  if (r?.message?.content) {
+    const c = r.message.content;
+    return typeof c === 'string' ? c : Array.isArray(c) ? c.map(p => p.text || '').join('') : String(c);
   }
-  if (response?.choices?.[0]?.message?.content) return response.choices[0].message.content;
-  if (response?.content?.[0]?.text) return response.content[0].text;
-  return String(response);
+  if (r?.choices?.[0]?.message?.content) return r.choices[0].message.content;
+  if (r?.content?.[0]?.text) return r.content[0].text;
+  return String(r);
 }
 
 function buildSystemPrompt() {
-  const unitTitle    = document.getElementById('unitTitle')?.textContent?.trim() || '';
-  const teoriaText   = document.getElementById('teoriaContent')?.innerText?.trim().slice(0, 3000) || '';
-  const formulasText = document.getElementById('formulasContent')?.innerText?.trim().slice(0, 1500) || '';
-
-  return `Sos un asistente inteligente y tutor de Investigación Operativa para ingeniería industrial en Argentina.
-Respondés siempre en español rioplatense (vos, te, etc.), de forma clara y concisa.
-Podés responder cualquier pregunta general, no solo de IO: comportate como una IA de propósito general.
-Si el alumno adjunta un PDF, analizá su contenido en detalle y respondé en base a él.
-Si adjunta una imagen o screenshot, describí e interpretá lo que ves con detalle, identificando ejercicios, tablas, fórmulas o conceptos visibles.
-Si menciona un video, reconocelo y respondé con lo que podés inferir.
-
-FORMATO DE TABLA SIMPLEX — Cuando resolvés ejercicios de Simplex o Programación Lineal, SIEMPRE usás tablas HTML con exactamente esta estructura:
-<table class="simplex-table">
-  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>[c1]</td><td>[c2]</td><td>...</td><td></td></tr>
-  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>[var1]</td><td>[var2]</td><td>...</td><td>bi/aij</td></tr>
-  <tr><td>[ck]</td><td>[xk]</td><td>[Bk]</td><td>[a11]</td><td>[a12]</td><td>...</td><td>[ratio]</td></tr>
-  <tr class="z-row"><td colspan="2">Z=[valor]</td><td></td><td>[zj-cj1]</td><td>[zj-cj2]</td><td>...</td><td>zj-cj</td></tr>
-</table>
-Marcás la celda pivote con class="pivot". Si hay múltiples iteraciones, generás una tabla por iteración. Explicás brevemente qué hiciste entre iteraciones.
-
-Unidad actual: ${unitTitle || 'Investigación Operativa'}
-Unidades del curso: 1. Intro a IO | 2. Programación Lineal | 3. Prog. Entera/Extensiones | 4. PERT/CPM | 5. Inventarios | 6. Teoría de Colas | 7. Simulación
-${teoriaText   ? '\nContenido de la guía (teoría):\n' + teoriaText   : ''}
-${formulasText ? '\nFórmulas de la unidad:\n'          + formulasText : ''}`;
+  const unit = document.getElementById('unitTitle')?.textContent?.trim() || 'IO';
+  return `Sos tutor de Investigación Operativa para ingeniería industrial argentina. Respondés en español rioplatense, claro y conciso. Respondés cualquier pregunta, no solo de IO. Para ejercicios Simplex usás tablas HTML con clases simplex-table/cj-row/header-row/z-row/pivot. Unidad actual: ${unit}.`;
 }
 
 // ---- Fallback offline ----
@@ -601,10 +610,24 @@ function showTyping() {
   div.id = id;
   div.innerHTML = `
     <div class="message-avatar">🤖</div>
-    <div class="message-bubble typing"><span></span><span></span><span></span></div>
+    <div class="message-bubble typing">
+      <span></span><span></span><span></span>
+      <small id="${id}-hint" style="display:block;margin-top:5px;font-size:11px;opacity:0.6"></small>
+    </div>
   `;
   chatMessages.appendChild(div);
   chatMessages.scrollTop = chatMessages.scrollHeight;
+  const hints = [
+    [5000,  'Pensando…'],
+    [12000, 'Tardando un poco más de lo habitual…'],
+    [22000, 'Casi listo, esperá…']
+  ];
+  hints.forEach(([ms, txt]) => {
+    setTimeout(() => {
+      const el = document.getElementById(id + '-hint');
+      if (el) el.textContent = txt;
+    }, ms);
+  });
   return id;
 }
 
