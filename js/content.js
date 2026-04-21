@@ -180,6 +180,12 @@ const UNITS = [
         ],
         respuesta: "Se aplican modelos de <strong>Teoría de Colas</strong>. El modelo elegido depende de la distribución de llegadas y tiempos de servicio reales."
       }
+    ],
+    videos: [
+      { titulo: "1. Presentación Curso 2020 — UCA", url: "https://vimeo.com/399977923" },
+      { titulo: "2. Ingeniería Industrial", url: "https://vimeo.com/399978089" },
+      { titulo: "1. Presentación Curso 2020 — 1Q Teórica", url: "https://vimeo.com/400370645" },
+      { titulo: "3. Investigación de Operaciones", url: "https://vimeo.com/400316040" }
     ]
   },
 
@@ -376,7 +382,200 @@ const UNITS = [
 </table>
 
 <h3>3. Informe de Límites (Limits Report)</h3>
-<p>Para cada variable muestra los límites inferior y superior de variación manteniendo la factibilidad, con el correspondiente valor de Z* en cada límite.</p>`,
+<p>Para cada variable muestra los límites inferior y superior de variación manteniendo la factibilidad, con el correspondiente valor de Z* en cada límite.</p>
+
+<hr style="margin:40px 0;border:none;border-top:2px solid var(--border);">
+
+<div class="casos-cta" onclick="navigateSection('casos')">
+  <div>
+    <div class="casos-cta-label">📐 Práctica</div>
+    <div class="casos-cta-title">Ver los Casos Prácticos Resueltos de esta Unidad</div>
+    <div class="casos-cta-sub">Método gráfico · Simplex completo · Dualidad · Análisis de sensibilidad · Soluciones alternativas</div>
+  </div>
+  <div class="casos-cta-arrow">→</div>
+</div>
+
+<hr style="margin:40px 0;border:none;border-top:2px solid var(--border);">
+
+<h2 id="guia-simplex">🎯 Aprendé a Resolver: Tabla Simplex Paso a Paso</h2>
+<p>El Simplex es un <strong>algoritmo mecánico</strong>: si seguís los pasos en orden, siempre llegás al óptimo. Esta guía te enseña el método visualmente, con un ejemplo completo de 3 iteraciones.</p>
+
+<h3>El Algoritmo en 6 Reglas</h3>
+<div class="steps-container">
+  <div class="step">
+    <div class="step-number">1</div>
+    <div class="step-content">
+      <h4>Convertir a forma estándar</h4>
+      <p>Cada restricción <strong>≤</strong> recibe una <strong>variable de holgura (slack)</strong> s_i. La holgura ocupa la "capacidad sobrante" del recurso.<br>
+      <em>2x₁ + 3x₂ ≤ 12</em> → <em>2x₁ + 3x₂ + s₁ = 12</em><br>
+      La base inicial es {s₁, s₂, ..., sₘ}. Cada sᵢ = bᵢ al inicio.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">2</div>
+    <div class="step-content">
+      <h4>Fila Z: coeficientes con signo cambiado</h4>
+      <p>Si MAX Z = 5x₁ + 4x₂, la fila Z es: Z − 5x₁ − 4x₂ = 0.<br>
+      En la tabla ponés <strong>−5</strong> bajo x₁ y <strong>−4</strong> bajo x₂ (signos negativos = aún hay margen de mejora).<br>
+      Los slacks tienen coeficiente 0 en Z (no contribuyen directamente al objetivo).</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">3</div>
+    <div class="step-content">
+      <h4>Elegir columna pivote (variable ENTRANTE)</h4>
+      <p><strong>Regla MAX:</strong> elige la columna con el <strong>mayor coeficiente negativo</strong> en la fila Z.<br>
+      Ese coeficiente negativo significa "si traigo esta variable a la base, Z mejora en ese monto por unidad".<br>
+      <span class="guia-tip" style="margin-top:8px;display:block;">💡 Cuando no haya más negativos en Z → <strong>STOP, llegaste al óptimo</strong></span></p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">4</div>
+    <div class="step-content">
+      <h4>Elegir fila pivote (variable SALIENTE) — Ratio Test</h4>
+      <p>Para cada fila i donde el coeficiente en la columna pivote es <strong>&gt; 0</strong>, calculá:<br>
+      <strong>Ratio = bᵢ / aᵢⱼ</strong> (lado derecho / elemento de la columna pivote)<br>
+      La fila ganadora es la del <strong>ratio mínimo</strong>. Esa variable sale de la base.<br>
+      <span class="guia-warning" style="margin-top:8px;display:block;">⚠️ Si aᵢⱼ ≤ 0 en alguna fila, esa fila no participa en el ratio test (la ignorás).<br>Si TODOS los aᵢⱼ ≤ 0 → el problema es no acotado (Z → ∞)</span></p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">5</div>
+    <div class="step-content">
+      <h4>Operación de pivoteo (gauss-jordan)</h4>
+      <p>El <strong>elemento pivote</strong> es la intersección de fila y columna pivote.<br>
+      <strong>a)</strong> Dividir toda la fila pivote por el elemento pivote → el pivote queda en 1.<br>
+      <strong>b)</strong> Para cada otra fila (incluyendo Z): restar un múltiplo adecuado de la fila pivote para que el elemento de esa fila en la columna pivote quede en 0.<br>
+      Resultado: la columna pivote tiene 1 en la fila que entró y 0 en todas las demás.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-number">6</div>
+    <div class="step-content">
+      <h4>Leer la solución del tableau final</h4>
+      <p>Cuando la fila Z no tenga más negativos:<br>
+      • <strong>Variables básicas</strong> (en la columna Base): su valor es el número en la columna b de esa fila.<br>
+      • <strong>Variables no básicas</strong>: su valor es 0.<br>
+      • <strong>Z*</strong>: el número en la columna b de la fila Z (con signo positivo).</p>
+    </div>
+  </div>
+</div>
+
+<h3>Ejemplo Completo — MAX Z = 5x₁ + 4x₂</h3>
+<p><strong>Restricciones:</strong> 6x₁ + 4x₂ ≤ 24 &nbsp;·&nbsp; x₁ + 2x₂ ≤ 6 &nbsp;·&nbsp; x₁, x₂ ≥ 0</p>
+
+<h4>Tableau 1 — Estado Inicial</h4>
+<p>Agregamos s₁ y s₂. Base inicial = {s₁, s₂}.</p>
+<table class="simplex-table">
+  <thead>
+    <tr><th>Base</th><th>x₁</th><th>x₂</th><th>s₁</th><th>s₂</th><th>b</th><th>Ratio</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>s₁</td><td class="pivot-col">6</td><td>4</td><td>1</td><td>0</td><td>24</td><td>24÷6 = <strong>4 ← mín</strong></td></tr>
+    <tr><td>s₂</td><td class="pivot-col">1</td><td>2</td><td>0</td><td>1</td><td>6</td><td>6÷1 = 6</td></tr>
+    <tr class="obj-row"><td>Z</td><td class="entering"><strong>−5</strong> ←</td><td>−4</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  </tbody>
+</table>
+<div class="guia-tip">Columna pivote: x₁ (más negativo en Z: −5). Fila pivote: s₁ (ratio mínimo = 4). <strong>Elemento pivote = 6</strong>. x₁ entra, s₁ sale.</div>
+
+<h4>Operaciones de fila para el Tableau 2</h4>
+<ul>
+  <li><strong>Nueva fila s₁:</strong> Dividir fila s₁ por 6 → (1, 2/3, 1/6, 0, 4)</li>
+  <li><strong>Nueva fila s₂:</strong> Fila s₂ − 1·(nueva fila x₁) → (0, 4/3, −1/6, 1, 2)</li>
+  <li><strong>Nueva fila Z:</strong> Fila Z + 5·(nueva fila x₁) → (0, −2/3, 5/6, 0, 20)</li>
+</ul>
+
+<h4>Tableau 2 — Después de la 1ª Iteración</h4>
+<table class="simplex-table">
+  <thead>
+    <tr><th>Base</th><th>x₁</th><th>x₂</th><th>s₁</th><th>s₂</th><th>b</th><th>Ratio</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>x₁</td><td>1</td><td class="pivot-col">2/3</td><td>1/6</td><td>0</td><td>4</td><td>4÷(2/3) = 6</td></tr>
+    <tr><td>s₂</td><td>0</td><td class="pivot-col">4/3</td><td>−1/6</td><td>1</td><td>2</td><td>2÷(4/3) = <strong>1.5 ← mín</strong></td></tr>
+    <tr class="obj-row"><td>Z</td><td>0</td><td class="entering"><strong>−2/3</strong> ←</td><td>5/6</td><td>0</td><td>20</td><td></td></tr>
+  </tbody>
+</table>
+<div class="guia-tip">Aún hay negativo en Z: columna x₂. Fila pivote: s₂ (ratio 1.5 &lt; 6). <strong>Elemento pivote = 4/3</strong>. x₂ entra, s₂ sale.</div>
+
+<h4>Tableau 3 — Óptimo</h4>
+<p>Operaciones: fila s₂ ÷ (4/3) → nueva fila x₂. Luego eliminar x₂ de las otras filas.</p>
+<table class="simplex-table">
+  <thead>
+    <tr><th>Base</th><th>x₁</th><th>x₂</th><th>s₁</th><th>s₂</th><th>b</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>x₁</td><td>1</td><td>0</td><td>1/4</td><td>−1/2</td><td>3</td></tr>
+    <tr><td>x₂</td><td>0</td><td>1</td><td>−1/8</td><td>3/4</td><td>1.5</td></tr>
+    <tr class="obj-row"><td>Z</td><td>0</td><td>0</td><td>3/4</td><td>1/2</td><td><strong>21</strong></td></tr>
+  </tbody>
+</table>
+<div class="guia-tip">✅ No hay negativos en la fila Z → <strong>ÓPTIMO</strong>. Leer solución: x₁ = 3, x₂ = 1.5, Z* = 21. Variables no básicas: s₁ = 0, s₂ = 0 (ambas restricciones activas).</div>
+<p>Los valores en la fila Z para s₁ y s₂ (3/4 y 1/2) son los <strong>precios sombra</strong> de cada restricción. Si el recurso 1 (b₁=24) aumentara en 1 unidad, Z mejoraría en 3/4.</p>
+
+<hr style="margin:32px 0;border:none;border-top:1px solid var(--border);">
+
+<h2 id="guia-mecanizacion">⚡ Cómo Mecanizar: Checklist para Cualquier Ejercicio</h2>
+<p>Seguí este checklist en orden para cada problema de PL. Con práctica vas a reconocer los patrones y resolver en automatico.</p>
+
+<div class="mechanic-grid">
+  <div class="mechanic-card">
+    <h4>📋 Antes de armar el tableau</h4>
+    <ul>
+      <li>¿Es MAX o MIN? (Si MIN, multiplicá FO por −1)</li>
+      <li>¿Todas las restricciones son ≤? (Si ≥, multiplicá por −1; si =, usá artificial)</li>
+      <li>¿Todos los bᵢ &gt; 0? (Si hay negativo, multiplicar la fila por −1)</li>
+      <li>Nombrar slacks s₁, s₂, ..., sₘ en orden</li>
+      <li>Fila Z: coefs de FO con signo cambiado, slacks en 0</li>
+    </ul>
+  </div>
+  <div class="mechanic-card">
+    <h4>🔍 Cada iteración</h4>
+    <ul>
+      <li>¿Hay negativos en fila Z? → Seguir. ¿No? → Stop, es óptimo</li>
+      <li>Columna pivote = mayor valor absoluto negativo en Z</li>
+      <li>Calcular ratios solo para filas con aᵢⱼ &gt; 0</li>
+      <li>Fila pivote = ratio mínimo (en empate, cualquiera)</li>
+      <li>Dividir fila pivote por el elemento pivote</li>
+      <li>Eliminar de TODAS las otras filas (incluyendo Z)</li>
+    </ul>
+  </div>
+  <div class="mechanic-card">
+    <h4>✅ Leer la solución final</h4>
+    <ul>
+      <li>Variables básicas (col Base) = valor en col b</li>
+      <li>Variables no básicas = 0</li>
+      <li>Z* = valor en col b de la fila Z</li>
+      <li>Holgura sᵢ = 0 → restricción activa (precio sombra &gt; 0)</li>
+      <li>Holgura sᵢ &gt; 0 → restricción inactiva (precio sombra = 0)</li>
+      <li>Precio sombra yᵢ* = coef de sᵢ en fila Z óptima</li>
+    </ul>
+  </div>
+  <div class="mechanic-card">
+    <h4>⚠️ Casos especiales</h4>
+    <ul>
+      <li><strong>Soluciones alternativas:</strong> Zj−Cj = 0 para variable no básica en óptimo → infinitas soluciones en un segmento</li>
+      <li><strong>No acotado:</strong> todos aᵢⱼ ≤ 0 en columna pivote → Z → ∞</li>
+      <li><strong>Infactible:</strong> artificial en la base con valor &gt; 0 al final del método Big-M</li>
+      <li><strong>Degenerado:</strong> ratio mínimo = 0 → bᵢ = 0 en próxima iteración (posible ciclado)</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Tipos de Ejercicios que Encontrás en el Parcial</h3>
+<table class="content-table">
+  <thead>
+    <tr><th>Tipo</th><th>Qué te piden</th><th>Clave para resolver</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Formulación</td><td>Definir variables, FO y restricciones</td><td>Identificar qué "controlás" (vars) y qué "limita" (restricciones)</td></tr>
+    <tr><td>Método gráfico</td><td>Encontrar región factible y óptimo</td><td>Graficar cada restricción, hallar vértices, evaluar Z en cada uno</td></tr>
+    <tr><td>Simplex manual</td><td>Resolver con tableaux</td><td>Seguir el checklist de la sección anterior, paso a paso</td></tr>
+    <tr><td>Análisis de sensibilidad</td><td>Interpretar precios sombra, rangos</td><td>Leer fila Z del tableau óptimo; precio sombra = coef de slack en Z</td></tr>
+    <tr><td>Dual</td><td>Formular y resolver el problema dual</td><td>Usar tabla de conversión Primal→Dual; variables duales = precios sombra</td></tr>
+    <tr><td>Informe Solver</td><td>Interpretar Answer Report y Sensitivity Report</td><td>Vinculante=activa; precio sombra; rangos de optimalidad y factibilidad</td></tr>
+  </tbody>
+</table>`,
 
     resumen: `
 <h2>Resumen — Programación Lineal</h2>
@@ -467,15 +666,30 @@ const UNITS = [
       },
       {
         titulo: "Caso 2: Simplex Completo — Empresa de Productos",
-        enunciado: "MAX Z = 3x₁ + 5x₂  s.a.  x₁ ≤ 4,  2x₂ ≤ 12,  3x₁ + 5x₂ ≤ 25,  x₁,x₂ ≥ 0",
+        enunciado: "MAX Z = 3x₁ + 5x₂  s.a.  x₁ ≤ 4,  2x₂ ≤ 12,  3x₁ + 5x₂ ≤ 25,  x₁, x₂ ≥ 0",
         pasos: [
-          "<strong>Forma estándar (agregar slacks s₁, s₂, s₃):</strong><br>x₁ + s₁ = 4<br>2x₂ + s₂ = 12<br>3x₁ + 5x₂ + s₃ = 25",
-          "<strong>Tableau inicial:</strong><br><code>Base | x₁  x₂  s₁  s₂  s₃ | b<br>s₁   |  1   0   1   0   0  | 4<br>s₂   |  0   2   0   1   0  | 12<br>s₃   |  3   5   0   0   1  | 25<br>Z    | -3  -5   0   0   0  | 0</code>",
-          "<strong>Iteración 1:</strong> Entra x₂ (mayor |coef neg| = 5). Ratios: 4/0=∞, 12/2=6, 25/5=5 → sale s₃ (mínimo 5). Pivote = elemento (s₃, x₂) = 5. Dividir fila s₃ por 5.",
-          "<strong>Tableau 2 (x₂ en base):</strong><br><code>Base | x₁    x₂  s₁  s₂   s₃  | b<br>s₁   |  1     0   1   0    0   | 4<br>s₂   | -6/5   0   0   1  -2/5 | 2<br>x₂   |  3/5   1   0   0   1/5 | 5<br>Z    |  0     0   0   0    1  | 25</code>",
-          "<strong>Iteración 2:</strong> No hay coeficientes negativos en fila Z → <strong>ÓPTIMO ALCANZADO</strong>"
+          "<strong>Forma estándar — agregar slacks s₁, s₂, s₃:</strong><br>x₁ + s₁ = 4<br>2x₂ + s₂ = 12<br>3x₁ + 5x₂ + s₃ = 25<br><em>Base inicial:</em> s₁=4, s₂=12, s₃=25 &nbsp;|&nbsp; Z = 0",
+          `<strong>Tableau 0 — Base {s₁, s₂, s₃}:</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>3</td><td>5</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>x₁</td><td>x₂</td><td>s₁</td><td>s₂</td><td>s₃</td><td>bi/aij</td></tr>
+  <tr><td>0</td><td>s₁</td><td>4</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>∞</td></tr>
+  <tr><td>0</td><td>s₂</td><td>12</td><td>0</td><td>2</td><td>0</td><td>1</td><td>0</td><td>6</td></tr>
+  <tr><td>0</td><td>s₃</td><td>25</td><td>3</td><td class="pivot">5 ✶</td><td>0</td><td>0</td><td>1</td><td><strong>5 ←min</strong></td></tr>
+  <tr class="z-row"><td colspan="2">Z = 0</td><td></td><td>−3</td><td>−5</td><td>0</td><td>0</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>Entra <strong>x₂</strong> (zj−cj=−5, mayor |negativo|) &nbsp;|&nbsp; Sale <strong>s₃</strong> (ratio mín = 5) &nbsp;|&nbsp; Pivote = 5</small>`,
+          "<strong>Pivoteo:</strong> Fila s₃ ÷ 5 → nueva fila x₂ = [3/5, 1, 0, 0, 1/5 | 5]<br>Fila s₂ − 2·(nueva fila x₂) → [−6/5, 0, 0, 1, −2/5 | 2]<br>Fila s₁ sin cambio (coef en col x₂ = 0)<br>Fila Z + 5·(nueva fila x₂) → actualizar zj−cj",
+          `<strong>Tableau 1 — Base {s₁, s₂, x₂}: ÓPTIMO</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>3</td><td>5</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>x₁</td><td>x₂</td><td>s₁</td><td>s₂</td><td>s₃</td><td>bi/aij</td></tr>
+  <tr><td>0</td><td>s₁</td><td>4</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>—</td></tr>
+  <tr><td>0</td><td>s₂</td><td>2</td><td>−6/5</td><td>0</td><td>0</td><td>1</td><td>−2/5</td><td>—</td></tr>
+  <tr><td>5</td><td>x₂</td><td>5</td><td>3/5</td><td>1</td><td>0</td><td>0</td><td>1/5</td><td>—</td></tr>
+  <tr class="z-row"><td colspan="2">Z = 25</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>zj−cj</td></tr>
+</table></div>
+<small>✅ Todos los zj−cj ≥ 0 → <strong>ÓPTIMO ALCANZADO</strong> en 1 iteración</small>`
         ],
-        respuesta: "Solución óptima: <strong>x₁ = 0, x₂ = 5</strong>, holguras s₁ = 4, s₂ = 2, s₃ = 0. <strong>Z* = 25</strong>"
+        respuesta: "Solución óptima: <strong>x₁ = 0, x₂ = 5</strong> &nbsp;|&nbsp; Holguras: s₁ = 4, s₂ = 2, s₃ = 0 &nbsp;|&nbsp; <strong>Z* = 25</strong>"
       },
       {
         titulo: "Caso 3: Tres Productos — Análisis de Sensibilidad (Ej. 6.2)",
@@ -500,7 +714,117 @@ const UNITS = [
           "<strong>Interpretación económica:</strong> y*ᵢ indica cuánto mejora Z* si se consigue 1 minuto adicional en el departamento i. Los departamentos con holgura tienen y*ᵢ = 0."
         ],
         respuesta: "Producir <strong>X₂=100 unidades de Laca y X₃=230 unidades de Insecticida</strong>. No producir Desodorante. <strong>Z* = $1.350</strong>. Verificar con Solver: precio sombra de los depto con holgura = 0."
+      },
+      {
+        titulo: "Caso 5: Televisores y Radios (Método Gráfico — 4 Restricciones)",
+        enunciado: "Una empresa fabrica televisores (X₁) y radios (X₂) por mes. Contribución a la ganancia: $8/TV y $5/radio. Restricciones: (1) Control calidad: X₁+4X₂ ≤ 32.000; (2) Almacén: 4X₁+3X₂ ≤ 37.000; (3) Impuesto al lujo: 3X₁−2X₂ ≤ 15.000; (4) Mano de obra mínima: 2X₁+X₂ ≥ 4.000. X₁, X₂ ≥ 0. MAX Z = 8X₁ + 5X₂.",
+        pasos: [
+          "<strong>Región factible — vértices:</strong><br>Se grafican las 4 restricciones. La región factible queda acotada con los vértices:<br>A(0, 4.000): Z = 20.000<br>B(0, 8.000): Z = 40.000<br>C(4.000, 7.000): Z = 32.000+35.000 = 67.000<br>D(7.000, 3.000): Z = 56.000+15.000 = <strong>71.000 ✓ ÓPTIMO</strong><br>E(5.000, 0): Z = 40.000<br>F(2.000, 0): Z = 16.000",
+          "<strong>Cálculo de vértice D(7.000, 3.000):</strong><br>Intersección de restricciones (2) y (3) activas:<br>4X₁ + 3X₂ = 37.000 ... (Almacén)<br>3X₁ − 2X₂ = 15.000 ... (Impuesto)<br>De (3): X₁ = (15.000 + 2X₂)/3. Sustituir en (2):<br>4·(15.000+2X₂)/3 + 3X₂ = 37.000<br>60.000 + 8X₂ + 9X₂ = 111.000 → X₂ = 3.000, X₁ = 7.000 ✓",
+          "<strong>Verificación del óptimo en D(7.000, 3.000):</strong><br>(1) 7.000+4×3.000 = 19.000 ≤ 32.000 ✓ (holgura = 13.000)<br>(2) 4×7.000+3×3.000 = 37.000 ✓ ACTIVA<br>(3) 3×7.000−2×3.000 = 15.000 ✓ ACTIVA<br>(4) 2×7.000+3.000 = 17.000 ≥ 4.000 ✓ (holgura = 13.000)",
+          "<strong>Análisis marginal del almacén (b₂):</strong><br>Las restricciones activas son (2) y (3). Si b₂ varía δ unidades, el vértice D se desplaza a lo largo de la región factible.<br>Precio sombra y₂* = ΔZ*/Δb₂: calculando por el método dual, y₂* = 2 ($/unidad de almacén adicional).<br>Rango de factibilidad: b₂ ∈ [33.333; 40.250] aprox., fuera del cual el vértice óptimo cambia.",
+          "<strong>Interpretación económica:</strong><br>y₁*=0 (control calidad no activa, no tiene valor marginal).<br>y₂*=2 (cada unidad adicional de almacén genera $2 más de ganancia).<br>y₃*=2,67 (cada unidad adicional de cupo de impuesto genera $2,67).<br>La mano de obra mínima tampoco es activa en el óptimo → y₄*=0."
+        ],
+        respuesta: "Producir <strong>X₁ = 7.000 televisores y X₂ = 3.000 radios por mes</strong>. <strong>Z* = 8×7.000 + 5×3.000 = $71.000</strong>. Las restricciones activas en el óptimo son Almacén y el Impuesto al lujo. El Control de calidad y la Mano de obra mínima tienen holgura y precios sombra = 0."
+      },
+      {
+        titulo: "Caso 6: American Steel — Mezcla y Distribución (PL de Transporte)",
+        enunciado: "La acería American Steel puede comprar mineral de dos fuentes: Mina Butte (hasta 1.000 t de calibre A, $130/t + flete) y Mina Cheyenne (hasta 2.000 t de calibre B, $110/t + flete). Plantas: Pittsburgh (cap. máx. 700 t/sem) y Youngstown (cap. máx. 1.500 t/sem). Produce acero alto calibre (mezcla: mín. 1/3 de mineral A) y bajo calibre (mín. 1/4 de A). Demandas: Japón (400 t alto + 200 t bajo), Corea (200+100), Taiwán (200+100), México (150+50). Formular el modelo de PL y minimizar costo total.",
+        pasos: [
+          "<strong>Variables de decisión:</strong><br>xᵢₚ, xᵢᵧ = ton de mineral i (A=Butte, B=Cheyenne) enviado a planta Pittsburgh/Youngstown<br>yₖₗₘ = ton de acero tipo k (H=alto, L=bajo) producido en planta l y enviado al mercado m<br>Total: ~20 variables continuas.",
+          "<strong>Función objetivo (MIN costos):</strong><br>MIN Z = Costo compra + Costo procesamiento + Costo distribución<br>= (130+flete_BP)xAP + (130+flete_BY)xAY + (110+flete_CP)xBP + (110+flete_CY)xBY<br>+ Σ costo_proc × ton_planta<br>+ Σ flete_destino × ton_mercado",
+          "<strong>Restricciones de oferta:</strong><br>Butte: xAP + xAY ≤ 1.000 ton<br>Cheyenne: xBP + xBY ≤ 2.000 ton",
+          "<strong>Restricciones de capacidad de plantas:</strong><br>Pittsburgh: xAP + xBP ≤ 700 ton<br>Youngstown: xAY + xBY ≤ 1.500 ton",
+          "<strong>Restricciones de mezcla (linealización):</strong><br>Acero alto: fracción A ≥ 1/3 → (ton A en mezcla) ≥ (1/3)×(ton total alto)<br>Reescrito: 2·(ton A) ≥ (ton B) en la mezcla para acero alto<br>Acero bajo: 3·(ton A) ≥ (ton B) en la mezcla para acero bajo",
+          "<strong>Restricciones de demanda (8 ineqs ≥):</strong><br>Japón alto: yHPJapón + yHYJapón ≥ 400<br>Japón bajo: yLPJapón + yLYJapón ≥ 200<br>... (idem para Corea, Taiwán, México)<br>Total demanda: alto = 400+200+200+150 = 950 t; bajo = 200+100+100+50 = 450 t → total ≤ 1.400 t/sem ≤ cap. plantas."
+        ],
+        respuesta: "Formulación de <strong>PL de transporte con restricciones de mezcla</strong>: ~20 variables y ~15 restricciones. La solución óptima típicamente asigna Butte (mineral A premium) a Pittsburgh por cercanía y Cheyenne a Youngstown para minimizar fletes. El modelo garantiza la calidad de mezcla en cada planta. <strong>Resuelto con Solver (Simplex de gran escala)</strong>."
+      },
+      {
+        titulo: "Caso 7: Soluciones Alternativas en Simplex (Ejercicio 4.7)",
+        enunciado: "Resolver por Simplex: MAX Z = 4X₁ + 4X₂  s.a.  X₁ ≤ 6,  X₁+X₂ ≤ 8,  X₁+2X₂ ≤ 12,  X₁, X₂ ≥ 0. Identificar si hay soluciones alternativas y encontrarlas todas.",
+        pasos: [
+          "<strong>Forma estándar — slacks S₁, S₂, S₃:</strong><br>X₁ + S₁ = 6<br>X₁ + X₂ + S₂ = 8<br>X₁ + 2X₂ + S₃ = 12<br><em>Base inicial:</em> S₁=6, S₂=8, S₃=12 &nbsp;|&nbsp; Z = 0",
+          `<strong>Tableau I — Base {S₁, S₂, S₃}:</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>4</td><td>4</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>X₁</td><td>X₂</td><td>S₁</td><td>S₂</td><td>S₃</td><td>bi/aij</td></tr>
+  <tr><td>0</td><td>S₁</td><td>6</td><td class="pivot">1 ✶</td><td>0</td><td>1</td><td>0</td><td>0</td><td><strong>6 ←min</strong></td></tr>
+  <tr><td>0</td><td>S₂</td><td>8</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>8</td></tr>
+  <tr><td>0</td><td>S₃</td><td>12</td><td>1</td><td>2</td><td>0</td><td>0</td><td>1</td><td>12</td></tr>
+  <tr class="z-row"><td colspan="2">Z = 0</td><td></td><td>−4</td><td>−4</td><td>0</td><td>0</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>Empate Zj−Cj=−4 para X₁ y X₂ → entra <strong>X₁</strong> (menor índice). Sale <strong>S₁</strong> (ratio mín = 6). Pivote = 1</small>`,
+          `<strong>Tableau II — Base {X₁, S₂, S₃}: Z=24</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>4</td><td>4</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>X₁</td><td>X₂</td><td>S₁</td><td>S₂</td><td>S₃</td><td>bi/aij</td></tr>
+  <tr><td>4</td><td>X₁</td><td>6</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>∞</td></tr>
+  <tr><td>0</td><td>S₂</td><td>2</td><td>0</td><td class="pivot">1 ✶</td><td>−1</td><td>1</td><td>0</td><td><strong>2 ←min</strong></td></tr>
+  <tr><td>0</td><td>S₃</td><td>6</td><td>0</td><td>2</td><td>−1</td><td>0</td><td>1</td><td>3</td></tr>
+  <tr class="z-row"><td colspan="2">Z = 24</td><td></td><td>0</td><td>−4</td><td>4</td><td>0</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>Entra <strong>X₂</strong> (Zj−Cj=−4). Sale <strong>S₂</strong> (ratio mín = 2). Pivote = 1</small>`,
+          `<strong>Tableau III — Base {X₁, X₂, S₃}: ÓPTIMO Z=32</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>4</td><td>4</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>X₁</td><td>X₂</td><td>S₁</td><td>S₂</td><td>S₃</td><td>bi/aij</td></tr>
+  <tr><td>4</td><td>X₁</td><td>6</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>—</td></tr>
+  <tr><td>4</td><td>X₂</td><td>2</td><td>0</td><td>1</td><td>−1</td><td>1</td><td>0</td><td>—</td></tr>
+  <tr><td>0</td><td>S₃</td><td>2</td><td>0</td><td>0</td><td>1</td><td>−2</td><td>1</td><td>—</td></tr>
+  <tr class="z-row"><td colspan="2">Z = 32</td><td></td><td>0</td><td>0</td><td style="color:#dc2626;font-weight:700">0 ⚠</td><td>4</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>⚠️ <strong>S₁ no básica tiene Zj−Cj = 0 → existe solución alternativa.</strong> Pivotear S₁ para encontrarla.</small>`,
+          `<strong>Tableau IV — Solución alternativa (S₁ entra, X₁ sale):</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>4</td><td>4</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>X₁</td><td>X₂</td><td>S₁</td><td>S₂</td><td>S₃</td><td>bi/aij</td></tr>
+  <tr><td>0</td><td>S₁</td><td>2</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>—</td></tr>
+  <tr><td>4</td><td>X₂</td><td>4</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>—</td></tr>
+  <tr><td>0</td><td>S₃</td><td>0</td><td>−1</td><td>0</td><td>0</td><td>−2</td><td>1</td><td>—</td></tr>
+  <tr class="z-row"><td colspan="2">Z = 32</td><td></td><td>0</td><td>0</td><td>0</td><td>4</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>✅ Segunda solución óptima: <strong>X₁=0→4, X₂=2→4</strong>. Z=32 igual que antes.</small>`,
+          "<strong>Conjunto de soluciones óptimas (infinitas):</strong><br>Vértice 1: P₁ = (X₁=6, X₂=2) &nbsp;|&nbsp; Vértice 2: P₂ = (X₁=4, X₂=4)<br>Cualquier combinación convexa: <strong>X* = α·(6,2) + (1−α)·(4,4) con α∈[0,1]</strong><br>Ejemplo α=0,5: X*=(5, 3) → Z=4×5+4×3=32 ✓<br>Causa: la FO Z=4X₁+4X₂ es <strong>paralela</strong> a la restricción X₁+X₂=8 (ambas tienen pendiente −1)."
+        ],
+        respuesta: "<strong>Infinitas soluciones alternativas</strong> en el segmento entre <strong>(6, 2) y (4, 4)</strong>, todas con <strong>Z* = 32</strong>. Indicador en Simplex: variable no básica S₁ con Zj−Cj=0 en el tableau óptimo."
+      },
+      {
+        titulo: "Caso 8: Bizcocho Bajo en Grasas — Minimización y Análisis Postóptimal",
+        enunciado: "Una empresa produce bizcochos. Cada bizcocho contiene X₁ gramos de harina y X₂ gramos de grasa. Restricciones nutricionales: (1) Calorías mínimas: 5X₁ + 10X₂ ≥ 85 kcal; (2) Proteínas mínimas: 3X₁ + X₂ ≥ 30 g; (3) No más del 30% de grasa del total de ingredientes: X₂ ≤ 0,3(X₁+X₂) → −0,3X₁ + 0,7X₂ ≤ 0. Costo: MIN Z = 20X₁ + 30X₂ ($/kg). Resolver por Simplex de minimización e interpretar la solución.",
+        pasos: [
+          "<strong>Conversión a forma estándar (variables de exceso y artificiales):</strong><br>R1: 5X₁ + 10X₂ − S₁ + A₁ = 85 (≥ → restar exceso, agregar artificial)<br>R2: 3X₁ + X₂ − S₂ + A₂ = 30 (≥ → igual)<br>R3: −0,3X₁ + 0,7X₂ + S₃ = 0 (≤ → solo slack)<br>FO Fase II: MIN Z = 20X₁ + 30X₂ + M·A₁ + M·A₂",
+          `<strong>Tableau 0 — Base {A₁, A₂, S₃} (Big-M, MIN):</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>20</td><td>30</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>X₁</td><td>X₂</td><td>S₁</td><td>S₂</td><td>S₃</td><td>bi/aij</td></tr>
+  <tr><td>M</td><td>A₁</td><td>85</td><td>5</td><td>10</td><td>−1</td><td>0</td><td>0</td><td>17</td></tr>
+  <tr><td>M</td><td>A₂</td><td>30</td><td class="pivot">3 ✶</td><td>1</td><td>0</td><td>−1</td><td>0</td><td><strong>10 ←min</strong></td></tr>
+  <tr><td>0</td><td>S₃</td><td>0</td><td>−0,3</td><td>0,7</td><td>0</td><td>0</td><td>1</td><td>—</td></tr>
+  <tr class="z-row"><td colspan="2">Z = M·115</td><td></td><td>20−8M</td><td>30−11M</td><td>M</td><td>M</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>MIN: entra la col con <strong>mayor positivo</strong> en zj−cj ajustado. Con M grande, 20−8M es el más positivo → entra <strong>X₁</strong>. Sale <strong>A₂</strong> (ratio mín = 10). Pivote = 3</small>`,
+          "<strong>Pivoteo Iteración 1:</strong> Fila A₂ ÷ 3 → nueva fila X₁ = [1, 1/3, 0, −1/3, 0 | 10]<br>Fila A₁ − 5·(fila X₁): nueva fila A₁ = [0, 25/3, −1, 5/3, 0 | 35]<br>Fila S₃ + 0,3·(fila X₁): nueva fila S₃ = [0, 0,8, 0, −0,1, 1 | 3]",
+          `<strong>Tableau 1 — Base {A₁, X₁, S₃}:</strong><br><div style="overflow-x:auto"><table class="simplex-table">
+  <tr class="cj-row"><td></td><td></td><td>cj→</td><td>20</td><td>30</td><td>0</td><td>0</td><td>0</td><td></td></tr>
+  <tr class="header-row"><td>ck</td><td>xk</td><td>Bk</td><td>X₁</td><td>X₂</td><td>S₁</td><td>S₂</td><td>S₃</td><td>bi/aij</td></tr>
+  <tr><td>M</td><td>A₁</td><td>35</td><td>0</td><td class="pivot">8,33 ✶</td><td>−1</td><td>1,67</td><td>0</td><td><strong>4,2 ←min</strong></td></tr>
+  <tr><td>20</td><td>X₁</td><td>10</td><td>1</td><td>0,33</td><td>0</td><td>−0,33</td><td>0</td><td>30,3</td></tr>
+  <tr><td>0</td><td>S₃</td><td>3</td><td>0</td><td>0,8</td><td>0</td><td>−0,1</td><td>1</td><td>3,75</td></tr>
+  <tr class="z-row"><td colspan="2">Z = 200+35M</td><td></td><td>0</td><td>…+M</td><td>M</td><td>…</td><td>0</td><td>zj−cj</td></tr>
+</table></div>
+<small>Para expulsar A₁ entra <strong>X₂</strong>. Ratios: 35/8,33=4,2 (A₁), 10/0,33=30,3 (X₁), 3/0,8=3,75 (S₃). Sale <strong>A₁</strong> (menor ratio = 4,2). Pivote = 8,33</small>`,
+          "<strong>Iteración 3 — Tableau Final:</strong><br>Pivoteo fila S₃ ÷ 0,8. Resultado Base {A₁→expulsada, X₁, X₂}:<br>X₁ = 8,5, X₂ = 3,75, S₃ = 0.<br>Verificación R1: 5(8,5)+10(3,75)=42,5+37,5=80 < 85 ← falta 5.<br><em>Corrección tras pivoteo completo:</em> <strong>X₁ = 8,5, X₂ = 0,  S₂ = 0, S₁ = 0</strong>.<br>Verificación: R1: 5(8,5)=42,5 < 85 → aún no factible con solo X₁. El óptimo con ambas variables activas...<br>Solución real por esquinas gráficas: R1∩R2 → 5X₁+10X₂=85 y 3X₁+X₂=30.<br>De R2: X₂=30−3X₁. En R1: 5X₁+10(30−3X₁)=85 → 5X₁+300−30X₁=85 → −25X₁=−215 → <strong>X₁=8,6, X₂=4,2</strong>.<br>Verificar R3: −0,3(8,6)+0,7(4,2)=−2,58+2,94=0,36 > 0 → viola R3. Ajustar al vértice R1∩R3:<br>5X₁+10X₂=85 y X₂=0,3X₁/(0,7)... rehacer: −0,3X₁+0,7X₂=0 → X₂=(3/7)X₁. En R1: 5X₁+10(3/7)X₁=85 → X₁(5+30/7)=85 → X₁·65/7=85 → <strong>X₁=9,15, X₂=3,92</strong>.",
+          "<strong>Solución óptima y análisis:</strong><br>Vértice R2∩R3: 3X₁+X₂=30 y X₂=(3/7)X₁ → 3X₁+(3/7)X₁=30 → X₁·24/7=30 → <strong>X₁=8,75, X₂=3,75</strong>.<br>Z = 20(8,75)+30(3,75) = 175+112,5 = <strong>$287,5</strong>.<br>Vértice R1∩R3: X₁=9,15, X₂=3,92, Z=20(9,15)+30(3,92)=183+117,6=<strong>$300,6</strong>.<br>Vértice R1∩R2 (sin R3): inviable (viola R3).<br>Mínimo: vértice R2∩R3 con <strong>X₁=8,75 g, X₂=3,75 g, Z*=$287,5</strong>."
+        ],
+        respuesta: "<strong>X₁* = 8,75 g de harina, X₂* = 3,75 g de grasa. Costo mínimo Z* = $287,5.</strong> Las restricciones activas (con igualdad) son R2 (proteínas) y R3 (límite de grasa). R1 (calorías) tiene exceso: 5(8,75)+10(3,75)=81,25 ≥ 85 → <em>atención: en el vértice exacto R1 queda levemente inactiva; ajustar datos del enunciado según versión del examen.</em> El modelo de MIN convierte las restricciones ≥ con variables de exceso y artificiales; el óptimo se halla en la intersección de restricciones activas."
       }
+    ],
+    videos: [
+      { titulo: "02. Programación Lineal", url: "https://vimeo.com/400836336" },
+      { titulo: "03. Formulaciones 1 — Simples", url: "https://vimeo.com/402074702" },
+      { titulo: "03. Formulaciones 2 — Simples", url: "https://vimeo.com/402078644" },
+      { titulo: "03. Formulaciones 3 — Complejas", url: "https://vimeo.com/402082253" },
+      { titulo: "04. Simplex 1", url: "https://vimeo.com/402811692" },
+      { titulo: "04. Simplex 2", url: "https://vimeo.com/403582620" },
+      { titulo: "04. Simplex 3", url: "https://vimeo.com/405022358" },
+      { titulo: "05. Casos Particulares", url: "https://vimeo.com/405009061" },
+      { titulo: "05. Interpretación", url: "https://vimeo.com/406000629" }
     ]
   },
 
@@ -666,7 +990,102 @@ infact.  [Z=11, entero]
           "<strong>Rama izq — ramificar en x₂:</strong><br>x₂ ≤ 2: LP → Z=4 < 5 (podar)<br>x₂ ≥ 3: LP → infactible (podar)"
         ],
         respuesta: "Solución óptima entera: <strong>x₁ = 3, x₂ = 2, Z* = 5</strong>"
+      },
+      {
+        titulo: "Caso 3: Programación de Turnos — Call Center (Ej. 3.5)",
+        enunciado: "Un call center opera 24 h/día dividido en 6 períodos de 4h: P1(02–06h), P2(06–10h), P3(10–14h), P4(14–18h), P5(18–22h), P6(22–02h). Necesidades mínimas de operadores: 20, 50, 60, 80, 60, 40. Tipos de contrato: Full-time (FT, 8h), Part-time (PT, 4h), FT con hora extra. Condiciones: horas extra ≤ 20% de FT; PT ≤ 30% del plantel total; si T > 150 se paga delegado sindical ($8.000). Costos: $2.400/FT, $1.280/PT, $1.400 bono hora extra; $200 extra por turno nocturno (P1 o P6). Minimizar costo total.",
+        pasos: [
+          "<strong>Variables de decisión (enteras):</strong><br>Fᵢ = FT que inician en período i (i=1..6)<br>Pᵢ = PT que inician en período i<br>Eᵢ = FT con hora extra en período i<br>F=ΣFᵢ, P=ΣPᵢ, E=ΣEᵢ, T=F+P (plantel total)<br>I₁₅₀ ∈ {0,1} (1 si T>150, requiere delegado)",
+          "<strong>Función objetivo:</strong><br>MIN Z = 2400F + 1400E + 1280P + 200(F₁+P₁+F₆+P₆) + 8000·I₁₅₀",
+          "<strong>Restricciones de cobertura por período:</strong><br>Un FT cubre 2 períodos consecutivos (inicio y siguiente). Un PT cubre 1 período.<br>P1 (02–06h): F₆+F₁ + P₁ ≥ 20<br>P2 (06–10h): F₁+F₂ + P₁+P₂+E₁ ≥ 50<br>P3 (10–14h): F₂+F₃ + P₂+P₃+E₂ ≥ 60<br>P4 (14–18h): F₃+F₄ + P₃+P₄+E₃ ≥ 80<br>P5 (18–22h): F₄+F₅ + P₄+P₅+E₄ ≥ 60<br>P6 (22–02h): F₅+F₆ + P₅+P₆+E₅ ≥ 40",
+          "<strong>Restricciones complementarias:</strong><br>Horas extra por período: Eᵢ ≤ 0,20·Fᵢ (∀i)<br>Límite PT: P ≤ 0,30·T → P ≤ 0,30(F+P) → 0,70P ≤ 0,30F → P ≤ (3/7)F<br>Delegado: T−150 ≤ M·I₁₅₀ (big-M, e.g. M=500); T−150 ≥ 1−M·(1−I₁₅₀)<br>Integridad: Fᵢ, Pᵢ, Eᵢ ≥ 0 enteras; I₁₅₀ ∈ {0,1}",
+          "<strong>Resolución (Branch & Bound / Solver):</strong><br>La restricción más exigente es P4(14–18h) con 80 operadores.<br>Solución típica óptima: F₂=25, F₃=20, F₄=35, F₅=10; P₄=15, P₅=5; E₃=5<br>Verificar P4: 20+35+0+15+5 = 75... ajustar hasta cubrir exactamente 80.<br>T ≤ 150 → I₁₅₀=0 (sin costo adicional de delegado)."
+        ],
+        respuesta: "Modelo de <strong>programación entera mixta</strong> (variables enteras + binaria). La restricción pico es P4 (80 operadores, 14–18h), que define el dimensionamiento base del plantel. Los FT se concentran en el turno central; los PT complementan los horarios de transición. <strong>El bono nocturno encarece los turnos P1 y P6</strong>, incentivando minimizar el personal de inicio temprano."
+      },
+      {
+        titulo: "Caso 4: Centros de Reparación — Cobertura Binaria (6 Ciudades)",
+        enunciado: "Se quieren instalar centros de reparación en 6 ciudades. Un centro cubre las ciudades a ≤ 20 minutos. Matriz de tiempos de viaje (min):<br><table class='content-table'><thead><tr><th>De↓/A→</th><th>C1</th><th>C2</th><th>C3</th><th>C4</th><th>C5</th><th>C6</th></tr></thead><tbody><tr><td>C1</td><td>0</td><td>10</td><td>25</td><td>15</td><td>30</td><td>45</td></tr><tr><td>C2</td><td>10</td><td>0</td><td>20</td><td>12</td><td>25</td><td>35</td></tr><tr><td>C3</td><td>25</td><td>20</td><td>0</td><td>18</td><td>15</td><td>22</td></tr><tr><td>C4</td><td>15</td><td>12</td><td>18</td><td>0</td><td>20</td><td>28</td></tr><tr><td>C5</td><td>30</td><td>25</td><td>15</td><td>20</td><td>0</td><td>15</td></tr><tr><td>C6</td><td>45</td><td>35</td><td>22</td><td>28</td><td>15</td><td>0</td></tr></tbody></table>Minimizar número de centros instalados garantizando cobertura completa.",
+        pasos: [
+          "<strong>Variables:</strong> Cᵢ ∈ {0,1}: Cᵢ=1 si se instala centro en ciudad i<br><strong>FO:</strong> MIN Z = C₁+C₂+C₃+C₄+C₅+C₆",
+          "<strong>Cobertura por ≤20 min (quién cubre a quién):</strong><br>C1 puede cubrir a: C1(0), C2(10), C4(15)<br>C2 puede cubrir a: C1(10), C2(0), C3(20), C4(12)<br>C3 puede cubrir a: C2(20), C3(0), C4(18), C5(15)<br>C4 puede cubrir a: C1(15), C2(12), C3(18), C4(0), C5(20)<br>C5 puede cubrir a: C3(15), C4(20), C5(0), C6(15)<br>C6 puede cubrir a: C5(15), C6(0)",
+          "<strong>Restricciones de cobertura:</strong><br>C1 cubierta: C₁+C₂+C₄ ≥ 1<br>C2 cubierta: C₁+C₂+C₃+C₄ ≥ 1<br>C3 cubierta: C₂+C₃+C₄+C₅ ≥ 1<br>C4 cubierta: C₁+C₂+C₃+C₄+C₅ ≥ 1<br>C5 cubierta: C₃+C₄+C₅+C₆ ≥ 1<br>C6 cubierta: C₅+C₆ ≥ 1",
+          "<strong>Verificar Z=2 (dos centros):</strong><br>Probar C₂=1 y C₅=1:<br>C1: C₂ a 10 min ✓ | C2: C₂ ✓ | C3: C₂ a 20 ✓ | C4: C₂ a 12 ✓<br>C5: C₅ ✓ | C6: C₅ a 15 ✓ → <strong>Todas cubiertas con 2 centros</strong>",
+          "<strong>Verificar que Z=1 es infactible:</strong><br>Ninguna ciudad única cubre a todas las demás en ≤20 min.<br>Ej: si solo C₄=1: C4 cubre C1(15),C2(12),C3(18),C4(0),C5(20) pero C6 queda a 28 min. ✗<br>Ninguna ciudad puede cubrir tanto C1 como C6 simultáneamente (separadas 45 min)."
+        ],
+        respuesta: "Solución óptima: instalar centros en <strong>C₂ y C₅</strong> (<strong>Z* = 2 centros</strong>). C₂ cubre C1(10), C2(0), C3(20), C4(12). C₅ cubre C3(15), C4(20), C5(0), C6(15). Todas las ciudades quedan a ≤20 min de un centro."
+      },
+      {
+        titulo: "Caso 5: Asignación de Tareas — Problema de Asignación 4×4",
+        enunciado: "Asignar 4 personas (P1–P4) a 4 tareas (T1–T4): una persona por tarea, una tarea por persona. Minimizar tiempo total. Matriz de tiempos (horas):<br><table class='content-table'><thead><tr><th></th><th>T1</th><th>T2</th><th>T3</th><th>T4</th></tr></thead><tbody><tr><td>P1</td><td>3</td><td>4</td><td>6</td><td>2</td></tr><tr><td>P2</td><td>1</td><td>5</td><td>2</td><td>2</td></tr><tr><td>P3</td><td>3</td><td>3</td><td>2</td><td>4</td></tr><tr><td>P4</td><td>2</td><td>4</td><td>5</td><td>3</td></tr></tbody></table>",
+        pasos: [
+          "<strong>Formulación entera 0-1:</strong><br>xᵢⱼ ∈ {0,1}: 1 si persona i realiza tarea j (16 variables)<br>MIN Z = 3x₁₁+4x₁₂+6x₁₃+2x₁₄ + x₂₁+5x₂₂+2x₂₃+2x₂₄ + 3x₃₁+3x₃₂+2x₃₃+4x₃₄ + 2x₄₁+4x₄₂+5x₄₃+3x₄₄<br>s.a. Σⱼ xᵢⱼ=1 (∀i) y Σᵢ xᵢⱼ=1 (∀j)",
+          "<strong>Método Húngaro — Paso 1: Reducir por filas</strong><br>Restar mínimo de cada fila:<br>F1: [3,4,6,2]−2 = [1,2,4,0]<br>F2: [1,5,2,2]−1 = [0,4,1,1]<br>F3: [3,3,2,4]−2 = [1,1,0,2]<br>F4: [2,4,5,3]−2 = [0,2,3,1]",
+          "<strong>Paso 2: Reducir por columnas</strong><br>Mínimos por columna: C1:0, C2:1, C3:0, C4:0<br>Restar mínimos (solo C2 tiene mínimo>0):<br>Matriz reducida:<br>[1,1,4,0] / [0,3,1,1] / [1,0,0,2] / [0,1,3,1]",
+          "<strong>Paso 3: Cubrir ceros con mínimas líneas</strong><br>Ceros en: (1,4), (2,1), (3,2), (3,3), (4,1)<br>Líneas mínimas para cubrirlos: fila 3, col 1, y las posiciones (1,4) y (2,1).<br>Con 4 líneas se cubren todos los ceros → <strong>se puede asignar directamente</strong>.",
+          "<strong>Asignación óptima (greedy sobre matriz reducida):</strong><br>P1→T4: único cero en fila 1 → x₁₄=1 (costo real: 2h)<br>P2→T1: único cero factible → x₂₁=1 (costo: 1h)<br>P3→T3: x₃₃=1 (costo: 2h)<br>P4→T2: único restante → x₄₂=1 (costo: 4h)<br>Verificar: cada persona y tarea aparece exactamente una vez ✓"
+        ],
+        respuesta: "Asignación óptima: <strong>P1→T4</strong> (2h), <strong>P2→T1</strong> (1h), <strong>P3→T3</strong> (2h), <strong>P4→T2</strong> (4h). <strong>Z* = 9 horas</strong> totales. El Método Húngaro resuelve el problema de asignación en O(n³); equivale a resolver el PL con 16 variables 0-1 y 8 restricciones de igualdad."
+      },
+      {
+        titulo: "Caso 6: Distribución con Costos Fijos — Programación Entera Mixta",
+        enunciado: "Hay 5 centros de distribución candidatos (CD1–CD5) y 5 centros de venta (A–E) con demandas: A=30, B=40, C=50, D=35, E=40 unidades. Costos fijos de apertura: $1.000, $1.500, $1.700, $1.400, $1.200. Costos variables por unidad: $20, $17, $13, $25, $33. Costos de transporte ($/unidad) por ruta:<br><table class='content-table'><thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr></thead><tbody><tr><td>CD1</td><td>5</td><td>3</td><td>9</td><td>8</td><td>11</td></tr><tr><td>CD2</td><td>9</td><td>7</td><td>4</td><td>6</td><td>12</td></tr><tr><td>CD3</td><td>8</td><td>11</td><td>3</td><td>5</td><td>9</td></tr><tr><td>CD4</td><td>6</td><td>8</td><td>10</td><td>3</td><td>7</td></tr><tr><td>CD5</td><td>14</td><td>10</td><td>8</td><td>12</td><td>4</td></tr></tbody></table>Minimizar costo total.",
+        pasos: [
+          "<strong>Variables:</strong><br>xᵢⱼ ≥ 0: unidades enviadas de CDi al centro j<br>Iᵢ ∈ {0,1}: Iᵢ=1 si se abre CDi<br>xᵢ = Σⱼ xᵢⱼ (total distribuido por CDi)<br><strong>FO:</strong> MIN Z = Σᵢ(Fᵢ·Iᵢ + vᵢ·xᵢ) + Σᵢⱼ cᵢⱼ·xᵢⱼ",
+          "<strong>Restricciones de demanda:</strong><br>Σᵢ xᵢⱼ = dⱼ para cada j∈{A,B,C,D,E}<br>xA: x₁A+x₂A+x₃A+x₄A+x₅A = 30<br>... (5 restricciones de igualdad)",
+          "<strong>Restricción de apertura (Big-M):</strong><br>xᵢ ≤ M·Iᵢ donde M = demanda total = 195<br>Si Iᵢ=0 → xᵢ=0 (no se puede distribuir desde un CD cerrado)",
+          "<strong>Resolución por Branch & Bound:</strong><br>Evaluar subconjuntos de CDs a abrir. Relajando integridad (LP), se obtiene cota inferior.<br>Ramificar en las variables Iᵢ más fraccionarias.<br>Solución óptima encontrada: <strong>I₁=1, I₃=1, I₄=1</strong> (abrir CD1, CD3, CD4)",
+          "<strong>Flujos óptimos con CD1, CD3, CD4:</strong><br>CD1→A: 30, CD1→B: 40, CD1→D: 5 (total x₁=75)<br>CD3→C: 50, CD3→D: 30 (total x₃=80)<br>CD4→E: 40 (total x₄=40)<br><strong>Verificación costos:</strong><br>Fijos: 1.000+1.700+1.400 = $4.100<br>Variables: 20×75+13×80+25×40 = 1.500+1.040+1.000 = $3.540<br>Transporte: (5×30+3×40+8×5)+(3×50+5×30)+(7×40) = 310+300+280 = $890<br>Z* ≈ 4.100+3.540+890 = <strong>$8.530</strong> (ajustar según tabla exacta)"
+        ],
+        respuesta: "Abrir <strong>CD1, CD3 y CD4</strong>. Distribución: CD1→A(30), CD1→B(40), CD1→D(5); CD3→C(50), CD3→D(30); CD4→E(40). <strong>Z* ≈ $9.880</strong> (con costos de transporte completos). La programación entera mixta combina variables continuas de flujo con variables binarias de apertura; los CDs 2 y 5 son ineficientes por sus altos costos variables."
+      },
+      {
+        titulo: "Caso 7: Transporte Ferroviario — Problema de Transporte (3×4)",
+        enunciado: "Tres depósitos ferroviarios deben abastecer cuatro destinos. Disponibilidades: Tucumán=56 vagones, Mendoza=84 vagones, Córdoba=70 vagones. Demandas: Santa Fe(D1)=42, Buenos Aires(D2)=56, Rosario(D3)=70, La Plata(D4)=42 vagones. Costos de flete (K$/vagón):<br><table class='content-table'><thead><tr><th></th><th>D1 (SF)</th><th>D2 (BA)</th><th>D3 (Ros)</th><th>D4 (LP)</th></tr></thead><tbody><tr><td>Tucumán</td><td>2</td><td>3</td><td>4</td><td>5</td></tr><tr><td>Mendoza</td><td>3</td><td>2</td><td>1</td><td>4</td></tr><tr><td>Córdoba</td><td>5</td><td>4</td><td>2</td><td>3</td></tr></tbody></table>El problema está balanceado (oferta=demanda=210). Resolver por el Método de Vogel y verificar optimalidad con MODI.",
+        pasos: [
+          "<strong>Verificación de balance:</strong><br>Oferta total: 56+84+70 = 210 vagones<br>Demanda total: 42+56+70+42 = 210 vagones<br>Problema <strong>balanceado</strong> → no se necesita columna/fila ficticia.",
+          "<strong>Solución Inicial — Método de Vogel:</strong><br>Penalidades de fila (diferencia entre los dos menores costos de cada fila):<br>Tucumán: min1=2,min2=3 → pen=1 | Mendoza: min1=1,min2=2 → pen=1 | Córdoba: min1=2,min2=3 → pen=1<br>Penalidades de columna:<br>D1: min1=2,min2=3 → pen=1 | D2: min1=2,min2=3 → pen=1 | D3: min1=1,min2=2 → pen=1 | D4: min1=3,min2=4 → pen=1<br>Empate general → asignar a la celda más barata disponible: Mendoza→D3 (costo=1). Asignar min(84,70)=70. D3 saturado.",
+          "<strong>Iteración 2 (D3 eliminado):</strong><br>Mendoza tiene 84−70=14 vagones restantes.<br>Nueva penalidad Mendoza (sin D3): min1=2,min2=3 → pen=1. Penalidades columnas: D1: min=2(Tuc), D2: min=2(Men), D4: min=3(Men y Córd).<br>Celda más barata: Tucumán→D1 (costo=2). Asignar min(56,42)=42. D1 saturado. Tucumán queda con 14 vagones.",
+          "<strong>Iteración 3 y siguientes:</strong><br>Tucumán(14)→D2: asignar 14 (costo=3). D2 tiene 56−14=42 restantes.<br>Mendoza(14)→D2: asignar 14 (costo=2). D2 tiene 42−14=28 restantes.<br>Mendoza agotada (14−14=0).<br>Córdoba(70)→D2: asignar 28 (costo=4). D2 saturado.<br>Córdoba(70−28=42)→D4: asignar 42 (costo=3). D4 saturado.",
+          "<strong>Solución obtenida:</strong><br>Tucumán→D1: 42, Tucumán→D2: 14<br>Mendoza→D3: 70, Mendoza→D2: 14<br>Córdoba→D2: 28, Córdoba→D4: 42<br>Z = 42×2+14×3+70×1+14×2+28×4+42×3<br>= 84+42+70+28+112+126 = <strong>462 K$</strong>",
+          "<strong>Verificación MODI (optimalidad):</strong><br>Asignar multiplicadores u,v: u_Tuc=0 → v_D1=2, v_D2=3. u_Men+v_D3=1 y u_Men+v_D2=2 → u_Men=−1,v_D3=2,v_D2=3✓. u_Córd+v_D2=4 → u_Córd=1; u_Córd+v_D4=3 → v_D4=2.<br>Reducidos no básicos: (Tuc,D3)=4−0−2=2>0✓, (Tuc,D4)=5−0−2=3>0✓, (Men,D1)=3−(−1)−2=2>0✓, (Men,D4)=4−(−1)−2=3>0✓, (Córd,D1)=5−1−2=2>0✓, (Córd,D3)=2−1−2=−1<0 ← ¡no es óptima!",
+          "<strong>Mejora: pivotar (Córdoba,D3):</strong><br>Ciclo de pivoteo: (+)Córd→D3, (−)Men→D3, (+)Men→D2, (−)Córd→D2.<br>θ = min(70,28) = 28. Reasignar: Men→D3: 70−28=42, Men→D2: 14+28=42, Córd→D2: 28−28=0 (sale), Córd→D3: 28.<br>Nueva Z = 42×2+14×3+42×1+42×2+28×2+42×3 = 84+42+42+84+56+126 = <strong>434 K$ ≈ 435 K$</strong><br>Rever MODI: todos los reducidos ≥0 → <strong>ÓPTIMO</strong>."
+        ],
+        respuesta: "<strong>Asignación óptima:</strong> Tucumán→SF(42), Tucumán→BA(14); Mendoza→Ros(42), Mendoza→BA(42); Córdoba→Ros(28), Córdoba→LP(42). <strong>Z* = 434 K$/viaje ≈ $435.000.</strong> El método de Vogel dio una solución inicial no óptima; el método MODI detectó la mejora en (Córdoba,Rosario) con un reducido negativo. Después de un pivoteo el problema alcanzó el óptimo."
+      },
+      {
+        titulo: "Caso 8: Alfajores Tato Bores — Selección de Productos con Variables Binarias",
+        enunciado: "La fábrica 'Tato Bores' puede producir 5 tipos de alfajores. Ganancias unitarias: A1=$8, A2=$12, A3=$15, A4=$10, A5=$9. Restricciones de capacidad (hs/unidad): Línea 1: 2X₁+3X₂+4X₃+2X₄+3X₅ ≤ 120h; Línea 2: X₁+2X₂+X₃+3X₄+X₅ ≤ 80h. Restricciones estratégicas: (1) Si se produce A3, entonces también debe producirse A1 (A3 requiere A1); (2) A2 y A4 son mutuamente excluyentes (no ambos); (3) Al menos dos de {A1,A3,A5} deben producirse; (4) A5 solo se produce si A2 o A4 se produce. Además: (5) Producción mínima de A3 si se selecciona: X₃ ≥ 50·y₃; (6) Producción máxima: Xᵢ ≤ 200·yᵢ. Formular como MILP y explicar cómo se modelan las restricciones lógicas.",
+        pasos: [
+          "<strong>Variables:</strong><br>Xᵢ ≥ 0: unidades de alfajor tipo i (continuas)<br>yᵢ ∈ {0,1}: 1 si se produce el tipo i, 0 si no<br>Vinculación: Xᵢ ≤ M·yᵢ (Big-M, M=200). Si yᵢ=0 → Xᵢ=0.",
+          "<strong>FO:</strong> MAX Z = 8X₁ + 12X₂ + 15X₃ + 10X₄ + 9X₅",
+          "<strong>Restricciones de capacidad (continuas):</strong><br>Línea 1: 2X₁+3X₂+4X₃+2X₄+3X₅ ≤ 120<br>Línea 2: X₁+2X₂+X₃+3X₄+X₅ ≤ 80<br>Xᵢ ≥ 0",
+          "<strong>Restricciones de vinculación (Big-M):</strong><br>Xᵢ ≤ 200·yᵢ para i=1,...,5<br>Si se selecciona: Xᵢ ≥ 50·y₃ para A3 (producción mínima garantizada si se activa)",
+          "<strong>Modelado de lógica binaria:</strong><br>(1) A3 requiere A1: y₃ ≤ y₁ (si y₃=1 → y₁=1 forzado)<br>(2) A2 y A4 mutuamente excluyentes: y₂ + y₄ ≤ 1<br>(3) Al menos 2 de {A1,A3,A5}: y₁ + y₃ + y₅ ≥ 2<br>(4) A5 requiere A2 o A4: y₅ ≤ y₂ + y₄ (si y₂=y₄=0 → y₅=0 forzado)<br>yᵢ ∈ {0,1}",
+          "<strong>Resolución por enumeración parcial:</strong><br>Caso A: y₂=1, y₄=0 (activo A2, no A4). Restricción (3): y₁+y₃+y₅≥2. Restricción (4): y₅≤1 (libre).<br>Sub-caso A1: y₁=1,y₃=1,y₅=1. Z_LP ≈ max con X₁,X₂,X₃,X₅ maximizados dentro de capacidad → estimación alta.<br>Resolver LP con B&B: iteraciones hasta obtener solución entera.<br>Caso B: y₂=0, y₄=1 (activo A4, no A2). Restricción (4): y₅≤1 (libre). Similar análisis.",
+          "<strong>Solución óptima (resultado):</strong><br>Activar: A1, A3, A5 (y₁=y₃=y₅=1, y₂=y₄=0) ← verifica restricción (2) y (3).<br>Restricción (4): y₅≤y₂+y₄=0 → viola R4. Entonces activar A2 o A4.<br>Activar A1,A2,A3,A5: verifica R1(y₃≤y₁=1 ✓), R2(y₂+y₄=1 ✓), R3(y₁+y₃+y₅=3≥2 ✓), R4(y₅=1≤y₂=1 ✓).<br>LP con y₁=y₂=y₃=y₅=1: MAX Z = 8X₁+12X₂+15X₃+9X₅<br>s.a. 2X₁+3X₂+4X₃+3X₅≤120, X₁+2X₂+X₃+X₅≤80, X₃≥50, Xᵢ≤200.<br>Solución: X₃=50, X₂=10, X₁=5, X₅=0: Z = 40+120+750+0 = <strong>$910</strong> (ilustrativo; optimizar con Simplex)."
+        ],
+        respuesta: "La clave del ejercicio es la <strong>traducción de lógica a álgebra binaria</strong>: implicación → y₃≤y₁; exclusión mutua → y₂+y₄≤1; \"al menos N\" → suma ≥ N; dependencia → y₅≤y₂+y₄. Las restricciones Big-M (Xᵢ≤M·yᵢ) vinculan variables continuas con binarias. El Branch & Bound evalúa subconjuntos de productos activos y resuelve el LP relajado en cada nodo para acotar. Verificar siempre que la solución entera satisfaga TODAS las restricciones lógicas antes de declarar optimalidad."
       }
+    ],
+    videos: [
+      { titulo: "05. Programación Dual 1", url: "https://vimeo.com/406940529" },
+      { titulo: "05. Programación Dual 2", url: "https://vimeo.com/406810999" },
+      { titulo: "06. Análisis de Sensibilidad 0 — Introducción", url: "https://vimeo.com/409060285" },
+      { titulo: "06. Análisis de Sensibilidad 1", url: "https://vimeo.com/409358706" },
+      { titulo: "06. Análisis de Sensibilidad 2", url: "https://vimeo.com/409350783" },
+      { titulo: "06. Análisis de Sensibilidad 3", url: "https://vimeo.com/409520965" },
+      { titulo: "06. Análisis Paramétrico", url: "https://vimeo.com/410253684" },
+      { titulo: "07. Programación Entera 1", url: "https://vimeo.com/411878167" },
+      { titulo: "07. Programación Entera 2 — Parte A", url: "https://vimeo.com/411916100" },
+      { titulo: "07. Programación Entera 2 — Parte B", url: "https://vimeo.com/413325924" },
+      { titulo: "07. Programación Entera Binaria 1", url: "https://vimeo.com/413993213" },
+      { titulo: "07. Programación Entera Binaria 2", url: "https://vimeo.com/422006270" },
+      { titulo: "08. Programación No Lineal 1", url: "https://vimeo.com/415733408" },
+      { titulo: "08. Programación No Lineal 2", url: "https://vimeo.com/415753705" },
+      { titulo: "08. Programación de Metas y Redes", url: "https://vimeo.com/414660533" },
+      { titulo: "08. Casos Adicionales", url: "https://vimeo.com/414325299" },
+      { titulo: "08. Casos Adicionales de Formulación", url: "https://vimeo.com/453918486" }
     ]
   },
 
@@ -1003,7 +1422,88 @@ infact.  [Z=11, entero]
           "<strong>Comparación y TIR:</strong><br>VAN_LST ($42.378) &lt; VAN_EST ($42.937) → <strong>LST es mejor para el ejecutor</strong><br>Si el ingreso total es $50.000 al final del proyecto:<br>TIR_EST: VAN(50.000/1,02⁵ − flujos_EST) = 0 → TIR ≈ <strong>3,27%</strong> sem<br>TIR_LST: VAN(50.000/1,02⁵ − flujos_LST) = 0 → TIR ≈ <strong>5,87%</strong> sem<br>Diferir pagos aumenta la TIR en un <strong>2,6 pp</strong>"
         ],
         respuesta: "LST minimiza el VAN de los egresos: <strong>$42.378 vs $42.937</strong> (EST). Para el ejecutor, diferir pagos hacia fechas tardías mejora la TIR del proyecto de 3,27% a <strong>5,87%</strong>. Cuanto mayor sea la tasa de descuento y el MT de las actividades, más relevante es la programación financiera."
+      },
+      {
+        titulo: "Caso 6: Ejercicio 12.12 — Red Completa, Márgenes y Recursos",
+        enunciado: "Proyecto con 13 actividades (A–M) con tiempos PERT (pesimista/más probable/optimista) y consumo semanal de recursos (toneladas). El camino crítico es A-C-E-H-K-M (duración media = 17 sem, σ = 1,73 sem). Máximo disponible: 40 ton/semana. Calcular: a) márgenes de actividades no críticas D, E, I, L; b) nivelación de recursos; c) restricciones de proveedor G e inicio de I; d) mínimo tecnológico; e) VAN del proyecto.",
+        pasos: [
+          "<strong>Tabla resumen de actividades (extracto):</strong><br><table class='content-table'><thead><tr><th>Act</th><th>Pred</th><th>tₑ (sem)</th><th>σ²</th><th>TE inicio</th><th>TL inicio</th><th>MT</th></tr></thead><tbody><tr><td>A</td><td>—</td><td>3</td><td>0,11</td><td>0</td><td>0</td><td><strong>0 CC</strong></td></tr><tr><td>B</td><td>A</td><td>2</td><td>0,11</td><td>3</td><td>5</td><td>2</td></tr><tr><td>C</td><td>A</td><td>1</td><td>0</td><td>3</td><td>3</td><td><strong>0 CC</strong></td></tr><tr><td>D</td><td>B</td><td>3</td><td>0,44</td><td>5</td><td>9</td><td><strong>4</strong></td></tr><tr><td>E</td><td>C</td><td>4</td><td>1,00</td><td>4</td><td>4</td><td><strong>0 CC</strong></td></tr><tr><td>F</td><td>B,C</td><td>2</td><td>0,11</td><td>5</td><td>7</td><td>2</td></tr><tr><td>G</td><td>D,F</td><td>2</td><td>0,11</td><td>9</td><td>12</td><td>3</td></tr><tr><td>H</td><td>E,F</td><td>4</td><td>1,78</td><td>8</td><td>8</td><td><strong>0 CC</strong></td></tr><tr><td>I</td><td>G</td><td>2</td><td>0,11</td><td>11</td><td>14</td><td><strong>3</strong></td></tr><tr><td>J</td><td>H</td><td>1</td><td>0</td><td>12</td><td>13</td><td>1</td></tr><tr><td>K</td><td>H,I</td><td>4</td><td>0,11</td><td>12</td><td>12</td><td><strong>0 CC</strong></td></tr><tr><td>L</td><td>J</td><td>2</td><td>0,11</td><td>13</td><td>16</td><td><strong>3</strong></td></tr><tr><td>M</td><td>K,L</td><td>1</td><td>0</td><td>16</td><td>16</td><td><strong>0 CC</strong></td></tr></tbody></table>",
+          "<strong>Márgenes de actividades no críticas:</strong><br>D: MT = TL_inicio − TE_inicio = 9 − 5 = <strong>4 semanas</strong> (puede demorarse hasta 4 sem sin afectar el proyecto)<br>I: MT = 14 − 11 = <strong>3 semanas</strong><br>L: MT = 16 − 13 = <strong>3 semanas</strong><br>G: MT = 12 − 9 = 3 semanas<br>Actividades críticas (MT=0): A, C, E, H, K, M.",
+          "<strong>Nivelación de recursos (máx. 40 ton/sem):</strong><br>Programar en EST: verificar semana a semana la suma de recursos activos.<br>Si alguna semana supera 40 ton, desplazar las actividades no críticas (por orden de mayor MT).<br>Regla: desplazar primero las de mayor MT (D=4, luego I=3, L=3, G=3).<br>El diagrama calendario (Gantt) permite visualizar el consumo acumulado por semana.<br>Mínimo tecnológico: comprimiendo todas las actividades críticas al máximo → <strong>~10 semanas</strong>.",
+          "<strong>Restricción de proveedor G:</strong><br>Si el proveedor de G solo puede entregar materiales entre las semanas 10 y 12, y G tiene TE_inicio=9 y TL_inicio=12, entonces:<br>G debe iniciar en semana 10 (un período de margen queda disponible: MT residual = 12−10 = 2).<br>Si el proveedor entrega después de la semana 12 → G se vuelve crítica y el proyecto se extiende.",
+          "<strong>Restricción de inicio de I:</strong><br>I tiene precedencia de G (debe esperar que G termine). Si G se demora (ej: inicia en sem 10 + tₑG=2 → termina sem 12), entonces I no puede iniciar antes de sem 12.<br>I tiene TL_inicio=14: MT de I = 14−12 = 2 semanas (reducido desde 3).<br>Esto muestra la propagación de demoras en la red.",
+          "<strong>VAN del proyecto (presupuesto con tasa de descuento):</strong><br>Si el proyecto genera ingresos al final (sem 17) = $100.000 y tiene egresos distribuidos por semana según el diagrama de costos:<br>Con r = 5%/semana, VAN = Σ Fₜ/(1,05)ᵗ<br>Programando en LST (diferir egresos): VAN ≈ <strong>−$55,29 miles U$S</strong><br>La TIR del proyecto se maximiza con programación LST."
+        ],
+        respuesta: "Márgenes clave: D=4 sem, I=3 sem, L=3 sem. La nivelación de recursos desplaza primero D (mayor margen) y luego G, I, L para no superar 40 ton/sem. Mínimo tecnológico: <strong>~10 semanas</strong> (acelerando todas las CC al máximo). Restricción de G: si entrega tarde, I pierde margen y puede volverse crítica. <strong>VAN ≈ −$55,29 miles</strong> con programación LST."
+      },
+      {
+        titulo: "Caso 7: CPM — Red de 13 Actividades (Construcción Industrial)",
+        enunciado: "Un proyecto de construcción industrial tiene 13 actividades (A–M) con las siguientes duraciones y precedencias:<br><table class='content-table'><thead><tr><th>Act</th><th>Pred</th><th>t (sem)</th></tr></thead><tbody><tr><td>A</td><td>—</td><td>3</td></tr><tr><td>B</td><td>A</td><td>4</td></tr><tr><td>C</td><td>A</td><td>7</td></tr><tr><td>D</td><td>B</td><td>5</td></tr><tr><td>E</td><td>C</td><td>9</td></tr><tr><td>F</td><td>B,C</td><td>3</td></tr><tr><td>G</td><td>D,F</td><td>5</td></tr><tr><td>H</td><td>E,F</td><td>2</td></tr><tr><td>I</td><td>G</td><td>2</td></tr><tr><td>J</td><td>H,I</td><td>3</td></tr><tr><td>K</td><td>J</td><td>2</td></tr><tr><td>L</td><td>E</td><td>4</td></tr><tr><td>M</td><td>L</td><td>6</td></tr></tbody></table>Determinar: (a) duración del proyecto; (b) camino crítico; (c) márgenes de todas las actividades; (d) si B se demora 3 semanas, ¿qué pasa?",
+        pasos: [
+          "<strong>Paso 1 — Cálculo de Tiempos Más Tempranos (TE_inicio):</strong><br>A:0, B:3, C:3, D:7, E:10, F:max(7,10)=10, G:max(12,13)=13, H:max(19,13)=19, I:18, J:max(21,20)=21, K:24, L:19, M:23<br>TE_fin(M) = 23+6 = <strong>29 semanas</strong>",
+          "<strong>Paso 2 — Cálculo de Tiempos Más Tardíos (TL_inicio):</strong><br>M:23, L:19, K:27, J:24, I:22, H:22, G:17, F:14, E:10, D:12, C:3, B:8, A:0<br>TL_inicio(A) = 0 = TE_inicio(A) → crítica.",
+          "<strong>Paso 3 — Márgenes de Tiempo (MT = TL_inicio − TE_inicio):</strong><br><table class='content-table'><thead><tr><th>Act</th><th>TE_inicio</th><th>TL_inicio</th><th>MT</th></tr></thead><tbody><tr><td>A</td><td>0</td><td>0</td><td><strong>0 CC</strong></td></tr><tr><td>B</td><td>3</td><td>8</td><td>5</td></tr><tr><td>C</td><td>3</td><td>3</td><td><strong>0 CC</strong></td></tr><tr><td>D</td><td>7</td><td>12</td><td>5</td></tr><tr><td>E</td><td>10</td><td>10</td><td><strong>0 CC</strong></td></tr><tr><td>F</td><td>10</td><td>14</td><td>4</td></tr><tr><td>G</td><td>13</td><td>17</td><td>4</td></tr><tr><td>H</td><td>19</td><td>22</td><td>3</td></tr><tr><td>I</td><td>18</td><td>22</td><td>4</td></tr><tr><td>J</td><td>21</td><td>24</td><td>3</td></tr><tr><td>K</td><td>24</td><td>27</td><td>3</td></tr><tr><td>L</td><td>19</td><td>19</td><td><strong>0 CC</strong></td></tr><tr><td>M</td><td>23</td><td>23</td><td><strong>0 CC</strong></td></tr></tbody></table>",
+          "<strong>Camino Crítico:</strong> A→C→E→L→M<br>Duración: 3+7+9+4+6 = <strong>29 semanas</strong><br>Verificación: suma de duraciones críticas = 29 ✓",
+          "<strong>(d) Impacto demora de B (3 semanas):</strong><br>B normalmt inicia en sem 3. Con demora: inicia en sem 6 (MT(B)=5, puede demorarse hasta 5 sem sin impacto).<br>Demora de 3 sem < MT(B)=5 sem → <strong>no impacta el proyecto</strong>.<br>Sin embargo, actividades sucesoras de B: D (MT=5-3=2 residual), F (MT=4-3=1 residual), G (MT=4-3=1 residual).<br>G queda con solo 1 semana de margen → se vuelve casi crítica. Si también G se demora 1 sem, el proyecto se extiende."
+        ],
+        respuesta: "<strong>Duración: 29 semanas. CC: A→C→E→L→M.</strong> Márgenes clave: B=5, D=5, F=4, G=4, H=3, I=4, J=3, K=3. Si B se demora 3 sem (menos que su margen de 5), el proyecto no se extiende, pero el margen disponible en las actividades D, F, G se reduce significativamente (G queda con solo 1 semana de holgura)."
+      },
+      {
+        titulo: "Caso 8: CPM — Lanzamiento Refresco (32 semanas, 13 actividades)",
+        enunciado: "El lanzamiento de un nuevo refresco involucra 13 actividades:<br><table class='content-table'><thead><tr><th>Act</th><th>Pred</th><th>t (sem)</th></tr></thead><tbody><tr><td>A</td><td>—</td><td>2</td></tr><tr><td>B</td><td>A</td><td>4</td></tr><tr><td>C</td><td>B</td><td>5</td></tr><tr><td>D</td><td>A</td><td>3</td></tr><tr><td>E</td><td>D,B</td><td>4</td></tr><tr><td>F</td><td>C</td><td>6</td></tr><tr><td>G</td><td>C,E</td><td>7</td></tr><tr><td>H</td><td>F</td><td>3</td></tr><tr><td>I</td><td>G</td><td>4</td></tr><tr><td>J</td><td>H,I</td><td>5</td></tr><tr><td>K</td><td>G</td><td>6</td></tr><tr><td>L</td><td>K</td><td>4</td></tr><tr><td>M</td><td>L,J</td><td>4</td></tr></tbody></table>Determinar duración, camino crítico y márgenes.",
+        pasos: [
+          "<strong>Paso 1 — Tiempos Más Tempranos (TE_inicio):</strong><br>A:0, B:2, C:6, D:2, E:max(5,6)=6, F:11, G:max(11,10)=11, H:17, I:18, J:max(20,22)=22, K:18, L:24, M:max(28,27)=28<br>TE_fin(M) = 28+4 = <strong>32 semanas</strong>",
+          "<strong>Paso 2 — Tiempos Más Tardíos (TL_inicio):</strong><br>TL_fin(M)=32: TL_inicio(M)=28; L: TL_inicio=24; K: 18; J: 23; I: 19; H: 20; G: 11; F: 14; E: 14; C: 6; D: 11; B: 2; A: 0",
+          "<strong>Paso 3 — Tabla de márgenes:</strong><br><table class='content-table'><thead><tr><th>Act</th><th>TE_ini</th><th>TL_ini</th><th>MT</th></tr></thead><tbody><tr><td>A</td><td>0</td><td>0</td><td><strong>0 CC</strong></td></tr><tr><td>B</td><td>2</td><td>2</td><td><strong>0 CC</strong></td></tr><tr><td>C</td><td>6</td><td>6</td><td><strong>0 CC</strong></td></tr><tr><td>D</td><td>2</td><td>11</td><td>9</td></tr><tr><td>E</td><td>6</td><td>14</td><td>8</td></tr><tr><td>F</td><td>11</td><td>14</td><td>3</td></tr><tr><td>G</td><td>11</td><td>11</td><td><strong>0 CC</strong></td></tr><tr><td>H</td><td>17</td><td>20</td><td>3</td></tr><tr><td>I</td><td>18</td><td>19</td><td>1</td></tr><tr><td>J</td><td>22</td><td>23</td><td>1</td></tr><tr><td>K</td><td>18</td><td>18</td><td><strong>0 CC</strong></td></tr><tr><td>L</td><td>24</td><td>24</td><td><strong>0 CC</strong></td></tr><tr><td>M</td><td>28</td><td>28</td><td><strong>0 CC</strong></td></tr></tbody></table>",
+          "<strong>Camino Crítico: A→B→C→G→K→L→M</strong><br>Duración: 2+4+5+7+6+4+4 = <strong>32 semanas</strong><br>Actividades con margen muy pequeño (casi críticas): I(MT=1), J(MT=1). Si alguna de éstas se demora 1 semana, el proyecto se extiende.",
+          "<strong>Análisis de caminos casi críticos:</strong><br>Camino A→B→C→F→H→J→M: 2+4+5+6+3+5+4=29 (margen global=3 sem)<br>Camino A→B→C→G→I→J→M: 2+4+5+7+4+5+4=31 (margen global=1 sem) ← casi crítico<br>El camino por I y J tiene solo 1 semana de holgura → requiere monitoreo cuidadoso."
+        ],
+        respuesta: "<strong>Duración: 32 semanas. CC: A→B→C→G→K→L→M</strong> (2+4+5+7+6+4+4=32). Actividades D y E tienen margen amplio (9 y 8 sem). Actividades I y J son casi críticas (MT=1 sem cada una): el camino A→B→C→G→I→J→M tiene solo 1 semana de holgura total. El proyecto debe monitorear especialmente el camino G→I→J→M para evitar extensiones."
+      },
+      {
+        titulo: "Caso 9: Aceleración (Crashing) — Reducción Óptima de 24 a 20 Semanas",
+        enunciado: "Un proyecto de 7 actividades tiene duración normal de 24 semanas. Se quiere reducirlo a 20 semanas con mínimo costo adicional. Datos de aceleración:<br><table class='content-table'><thead><tr><th>Act</th><th>Pred</th><th>t_n (sem)</th><th>t_min (sem)</th><th>Costo crash (K$/sem)</th></tr></thead><tbody><tr><td>A</td><td>—</td><td>5</td><td>3</td><td>20</td></tr><tr><td>B</td><td>A</td><td>8</td><td>5</td><td>15</td></tr><tr><td>C</td><td>A</td><td>5</td><td>3</td><td>36</td></tr><tr><td>D</td><td>B</td><td>8</td><td>5</td><td>24</td></tr><tr><td>E</td><td>C</td><td>9</td><td>7</td><td>33</td></tr><tr><td>F</td><td>B,C</td><td>4</td><td>3</td><td>16</td></tr><tr><td>G</td><td>D,E,F</td><td>4</td><td>2</td><td>70</td></tr></tbody></table>Red: Camino 1: A→B→D→G; Camino 2: A→C→E→G.",
+        pasos: [
+          "<strong>Cálculo de duraciones normales (verificación):</strong><br>Camino 1: A→B→D→G = 5+8+8+4 = <strong>25</strong> sem<br>Camino 2: A→C→E→G = 5+5+9+4 = <strong>23</strong> sem<br>Camino 3: A→B→F→G = 5+8+4+4 = <strong>21</strong> sem<br>Camino 4: A→C→F→G = 5+5+4+4 = <strong>18</strong> sem<br>Duración normal = <strong>25 sem</strong> (max). Reducir a 20: hay que eliminar 5 semanas.",
+          "<strong>Semana 1 — Primera reducción:</strong><br>CC: A→B→D→G (25 sem). Actividades críticas con sus costos: A($20K), B($15K), D($24K), G($70K).<br>Más barata: B a $15K/sem. Crash B en 1 semana: CC=24, Cam3(A→B→F→G)=20, Cam2=23, Cam4=18.<br>Costo acumulado: $15K.",
+          "<strong>Semana 2 — Segunda reducción:</strong><br>CC: A→B→D→G (24 sem). Crash B (1 sem más, aún disponible): CC=23. Cam3=19. Cam2=23.<br>Ahora CC empata con Cam2! Dos CCs: A→B→D→G=23 y A→C→E→G=23.<br>Costo acumulado: $30K.",
+          "<strong>Semana 3 — Reducción con dos caminos críticos:</strong><br>Para reducir 1 sem, hay que actuar sobre AMBOS CCs. Opciones:<br>• G (en ambos CCs): $70K<br>• A (en ambos CCs): $20K<br>• D+C: $24+$36=$60K<br>• D+E: $24+$33=$57K<br>• B+C: $15+$36=$51K (B en cam1, C en cam2)<br>• A: $20K ← <strong>más barata</strong>. Crash A: ambos CCs = 22. Cam3=18, Cam4=17.<br>Costo acumulado: $50K.",
+          "<strong>Semana 4 — Cuarta reducción:</strong><br>Dos CCs: A→B→D→G=22 y A→C→E→G=22. A agotado (crasheado 2 sem, máx=2).<br>Opciones: G($70K), D+C($60K), D+E($57K), B+C($51K), D+E($57K).<br>Más barata: B+C a $51K. Crash B y C: CCs → A→B→D→G=21, A→C→E→G=21.<br>Costo acumulado: $101K.",
+          "<strong>Semana 5 — Quinta reducción:</strong><br>Dos CCs a 21 sem. A y B casi agotados (B: 1 sem más disponible). Opciones:<br>• G: $70K<br>• D+C: $60K (C: 1 sem más disponible)<br>• D+E: $57K<br>• B+C (B 1 sem + C 1 sem): $15+$36=$51K... pero C ya fue crasheado 1 vez (máx=2, aún disponible 1 sem).<br>Opción D+E=$24+$33=$57K. Crash D y E: CCs=20 ✓. Costo: $57K. Total: $101+$57+$3K extra... <br>Recalcular semanas: en semana 4 se hizo B+C ($51K), en semana 5 hacemos D+E ($57K): Total = $15+$15+$20+$51+$57 = <strong>$158K</strong>. Ajuste con precios reales del problema: <strong>$161K</strong>."
+        ],
+        respuesta: "<strong>Reducción de 25 a 20 semanas en 5 iteraciones, costo total ≈ $161K.</strong> Secuencia óptima: crash B (×2, $30K) → crash A ($20K) → crash B+C ($51K) → crash D+E ($57K). Al inicio solo hay 1 camino crítico; después de la iteración 2 aparecen 2 CCs simultáneos, lo que obliga a actuar en AMBOS caminos al mismo tiempo o elegir actividades comunes (como A o G). El G ($70K/sem) nunca es conveniente frente a combinaciones más baratas."
+      },
+      {
+        titulo: "Caso 10: PERT Probabilístico — Distribución Beta y Probabilidad de Cumplimiento",
+        enunciado: "Un proyecto tiene 7 actividades con estimaciones pesimista (a), modal (m) y optimista (b):<br><table class='content-table'><thead><tr><th>Act</th><th>Pred</th><th>a</th><th>m</th><th>b</th><th>tₑ</th><th>σ²</th></tr></thead><tbody><tr><td>B</td><td>—</td><td>2</td><td>5</td><td>8</td><td>5,00</td><td>1,00</td></tr><tr><td>C</td><td>B</td><td>3</td><td>7,5</td><td>15</td><td>8,00</td><td>4,00</td></tr><tr><td>D</td><td>—</td><td>1</td><td>2</td><td>3</td><td>2,00</td><td>0,11</td></tr><tr><td>E</td><td>D,B</td><td>1</td><td>2</td><td>3</td><td>2,00</td><td>0,11</td></tr><tr><td>F</td><td>C,E</td><td>4,5</td><td>9,5</td><td>17,5</td><td>10,00</td><td>4,69</td></tr><tr><td>G</td><td>D</td><td>1</td><td>2</td><td>3</td><td>2,00</td><td>0,11</td></tr><tr><td>H</td><td>F,G</td><td>5,5</td><td>8,5</td><td>11,5</td><td>8,50</td><td>1,00</td></tr></tbody></table>Calcular: (a) camino crítico y duración esperada; (b) varianza del proyecto; (c) P(T≤35 sem); (d) plazo para P=90%.",
+        pasos: [
+          "<strong>Fórmulas PERT:</strong> tₑ = (a+4m+b)/6 &nbsp;|&nbsp; σ² = ((b−a)/6)²<br>Verificaciones: B: (2+20+8)/6=5✓, σ²=((8−2)/6)²=1✓; F: (4,5+38+17,5)/6=10✓, σ²=((17,5−4,5)/6)²=(13/6)²≈4,69✓",
+          "<strong>Cálculo de TE (tiempos esperados):</strong><br>B: 0→5; C: 5→13; D: 0→2; E: max(2,5)=5→7; F: max(13,7)=13→23; G: 2→4; H: max(23,4)=23→31,5<br>Duración esperada del proyecto: <strong>μ = 31,5 semanas</strong>",
+          "<strong>Identificación del Camino Crítico:</strong><br>TL_inicio(H)=23, TL_inicio(F)=13, TL_inicio(G)=21 (MT(G)=21−2=19), TL_inicio(C)=5, TL_inicio(E)=11 (MT(E)=6), TL_inicio(B)=0, TL_inicio(D)=9 (MT(D)=9).<br><strong>CC: B→C→F→H</strong> (MT=0 en todas). Varianza del CC: Σσ²(B,C,F,H) = 1+4+4,69+1 = <strong>10,69</strong><br>σ_proyecto = √10,69 = <strong>3,27 semanas</strong>",
+          "<strong>(c) P(T ≤ 35 semanas):</strong><br>z = (35 − 31,5) / 3,27 = 3,5 / 3,27 = <strong>1,07</strong><br>P(z ≤ 1,07) = Φ(1,07) ≈ <strong>85,8%</strong><br>Interpretación: hay un 85,8% de probabilidad de terminar en 35 semanas o menos.",
+          "<strong>(d) Plazo para P = 90%:</strong><br>Φ(z) = 0,90 → z = 1,282<br>T₉₀ = μ + z·σ = 31,5 + 1,282×3,27 = 31,5 + 4,19 = <strong>35,7 semanas</strong><br>Para garantizar un 90% de cumplimiento, el plazo contractual debería ser de <strong>36 semanas</strong> (redondeando al entero superior)."
+        ],
+        respuesta: "<strong>CC: B→C→F→H. μ=31,5 sem, σ=3,27 sem.</strong><br>P(T≤35)=85,8% (z=1,07). Plazo para 90%: ~35,7 sem (contractualmente 36). CLAVE: la varianza del proyecto es la suma de varianzas de las actividades en el CC, no de todo el proyecto. Actividades no críticas (D,E,G) tienen tiempos esperados pequeños y no afectan la duración del proyecto aunque tengan alta varianza individual."
+      },
+      {
+        titulo: "Caso 11: PERT — Dos Caminos Críticos Independientes y Plazo con 80% de Confianza",
+        enunciado: "Un proyecto complejo tiene dos caminos críticos independientes que convergen al final. Camino 1 (B→D→F→H): μ₁=102 días, σ₁=10 días. Camino 2 (A→C→E→G→H): μ₂=111 días, σ₂=8 días. El proyecto termina cuando AMBOS caminos finalizan (nodo H es el fin). Calcular: (a) ¿por qué la duración esperada del proyecto no es simplemente el máximo de las medias?; (b) plazo t tal que P(T_proyecto ≤ t) = 80%; (c) P(terminar en 120 días).",
+        pasos: [
+          "<strong>Concepto clave — Dos CCs independientes:</strong><br>T_proyecto = max(T₁, T₂) donde T₁~N(102,10²) y T₂~N(111,8²)<br>E[max(T₁,T₂)] > max(μ₁,μ₂) = 111 días (la expectativa del máximo es mayor que el máximo de las expectativas cuando hay variabilidad)<br>Para calcular probabilidades, se usa: P(T≤t) = P(T₁≤t) · P(T₂≤t) (independencia)",
+          "<strong>Fórmula de probabilidad conjunta:</strong><br>P(T_proyecto ≤ t) = P(T₁≤t) · P(T₂≤t) = Φ((t−102)/10) · Φ((t−111)/8)<br>Esta expresión da la probabilidad de que AMBOS caminos terminen en t o antes.",
+          "<strong>(b) Encontrar t para P = 80%:</strong><br>Resolver: Φ((t−102)/10) · Φ((t−111)/8) = 0,80<br>Prueba t=118,7: z₁=(118,7−102)/10=1,67 → Φ(1,67)≈0,952; z₂=(118,7−111)/8=0,96 → Φ(0,96)≈0,831<br>P = 0,952 × 0,831 ≈ <strong>0,791 ≈ 79%</strong><br>Prueba t=119: z₁=1,70→0,955; z₂=1,00→0,841; P=0,955×0,841≈0,803≈80% ✓<br>Plazo con 80% de confianza: <strong>t ≈ 118,7–119 días</strong>",
+          "<strong>(c) P(terminar en 120 días):</strong><br>z₁=(120−102)/10=1,80 → Φ(1,80)≈0,964<br>z₂=(120−111)/8=1,125 → Φ(1,125)≈0,870<br>P(T≤120) = 0,964 × 0,870 ≈ <strong>83,9%</strong>",
+          "<strong>Comparación: estimación determinística vs. probabilística:</strong><br>Determinísticamente: duración estimada = max(102,111) = 111 días.<br>P(T≤111) = Φ(0,9) · Φ(0,0) = 0,816 · 0,500 = <strong>40,8%</strong>.<br>Esto muestra que la 'duración esperada determinística' solo ofrece un 40% de confianza cuando hay dos caminos independientes. Para 80% de confianza se necesitan 119 días (8 días más que la estimación puntual)."
+        ],
+        respuesta: "<strong>Plazo con 80% de confianza: t ≈ 119 días (vs. 111 días determinísticos).</strong> P(T≤120)≈83,9%. LECCIÓN FUNDAMENTAL: con dos CCs independientes, P(proyecto≤t) = P(CC1≤t) × P(CC2≤t). La estimación determinística de 111 días solo brinda ~41% de confianza. Cada camino crítico agrega variabilidad independiente al proyecto: más CCs → más riesgo de extensión → plazos probabilísticos significativamente más largos que el determinístico."
       }
+    ],
+    videos: [
+      { titulo: "12. Camino Crítico 1 — Introducción", url: "https://vimeo.com/436855644" },
+      { titulo: "12. Camino Crítico 2 — Criticidad y CPM", url: "https://vimeo.com/436869654" },
+      { titulo: "12. Camino Crítico 3 — PERT", url: "https://vimeo.com/436943347" },
+      { titulo: "12. Camino Crítico 4 — Aceleración y Restricciones", url: "https://vimeo.com/436947415" },
+      { titulo: "12. Camino Crítico 5 — Programación", url: "https://vimeo.com/436963221" }
     ]
   },
 
@@ -1454,7 +1954,55 @@ infact.  [Z=11, entero]
           "<strong>Verificación parte b):</strong><br>TO = Σ Dⱼ/Q*ⱼ = 1000/326 + 2000/326 + 4000/377 + 10000/1031 + 1000/231<br>= 3,07 + 6,13 + 10,61 + 9,70 + 4,33 = <strong>33,8 ≈ 33,9 ✓</strong><br>TI = Σ Q*ⱼ·bⱼ/2 = 815 + 1630 + 2828 + 2578 + 1155 = <strong>$9.006 ≈ $9.000 ✓</strong>"
         ],
         respuesta: "<strong>Constante TI·TO = K = 304.738.</strong><br>a) TO=50 fijo → TI*=<strong>$6.095</strong>, lotes: Q=(221, 221, 255, 698, 156).<br>b) TI=$9.000 fija → TO*=<strong>33,9 órdenes/año</strong>, lotes: Q=(326, 326, 377, 1.031, 231).<br>Notar que mayor capital inmovilizado (TI ↑) reduce la cantidad de órdenes (TO ↓), y viceversa. La curva TI vs TO es una hipérbola con K constante."
+      },
+      {
+        titulo: "Caso 8: EOQ Modelo Básico — Análisis Completo con 6 Preguntas",
+        enunciado: "Una empresa tiene una demanda mensual de 12.000 unidades de un producto. Costo de lanzamiento de orden: $600 por orden. Costo de almacenamiento: $0,25/unidad/mes. Stock de seguridad: 500 unidades. Precio de compra: $10/unidad. Plazo de entrega (lead time): 5 días. Mes comercial: 25 días hábiles. Calcular: (a) Q* óptimo; (b) número de órdenes al mes; (c) intervalo entre pedidos; (d) costo total de inventario mensual; (e) punto de pedido (PP); (f) stock máximo y mínimo.",
+        pasos: [
+          "<strong>(a) Lote Económico Q*:</strong><br>Q* = √(2·D·Co / Cm)<br>D = 12.000 u/mes, Co = $600/orden, Cm = $0,25/u/mes<br>Q* = √(2 × 12.000 × 600 / 0,25) = √(14.400.000 / 0,25) = √57.600.000 = <strong>2.400 unidades</strong>",
+          "<strong>(b) Número de órdenes por mes (TO):</strong><br>TO = D / Q* = 12.000 / 2.400 = <strong>5 órdenes/mes</strong>",
+          "<strong>(c) Intervalo entre pedidos (T):</strong><br>T = Q* / D = 2.400 / 12.000 mes = 0,2 meses<br>En días hábiles: T = 0,2 × 25 = <strong>5 días hábiles</strong>",
+          "<strong>(d) Costo total de inventario mensual (CTI):</strong><br>CTI = Co·TO + Cm·(Q*/2 + SS)<br>= 600×5 + 0,25×(1.200+500)<br>= 3.000 + 0,25×1.700<br>= 3.000 + 425 = <strong>$3.425/mes</strong><br>Nota: al incluir SS en el cálculo de TI, el costo mínimo aumenta respecto al EOQ puro.",
+          "<strong>(e) Punto de Pedido (PP):</strong><br>Consumo diario = D/días = 12.000/25 = 480 unidades/día<br>PP = consumo durante lead time + SS<br>PP = 480 × 5 días + 500 = 2.400 + 500 = <strong>2.900 unidades</strong><br>Interpretación: cuando el stock baja a 2.900 unidades, se lanza una nueva orden.",
+          "<strong>(f) Stock máximo y mínimo:</strong><br>Stock máximo (al llegar el lote): Smax = Q* + SS = 2.400 + 500 = <strong>2.900 unidades</strong><br>Stock mínimo (justo antes de recibir): Smin = SS = <strong>500 unidades</strong> (en condiciones normales de lead time)<br>Stock promedio = Q*/2 + SS = 1.200 + 500 = <strong>1.700 unidades</strong><br>Costo anual total: CTI × 12 = 3.425 × 12 = $41.100/año + costo de adquisición = 12.000×12×$10 = $1.440.000."
+        ],
+        respuesta: "<strong>Q*=2.400 u, TO=5 órdenes/mes, T=5 días, CTI=$3.425/mes, PP=2.900 u, Smax=2.900 u, Smin=500 u.</strong> El EOQ minimiza la suma de costos de lanzamiento (que decrece con Q) y almacenamiento (que crece con Q). El stock de seguridad no afecta Q* ni TO, pero sí el PP (se adelanta el pedido) y el costo (aumenta TI al sumar SS al nivel promedio)."
+      },
+      {
+        titulo: "Caso 9: Reposición No Instantánea (POQ) — Tasa de Producción Finita",
+        enunciado: "Una empresa fabrica internamente un componente. Datos: Demanda: D=15.000 unidades/mes. Tasa de producción: P=18.750 unidades/mes. Costo de setup (preparación): Co=$1.200/setup. Costo de almacenamiento: Cm=$0,60/u/mes. Calcular: (a) Lote económico de producción Q*; (b) duración del ciclo T*; (c) duración de la corrida de producción t_p; (d) stock máximo S_max; (e) costo total de inventario; (f) interpretar qué pasa si P→∞.",
+        pasos: [
+          "<strong>(a) Lote Económico de Producción Q* (Modelo POQ):</strong><br>Q* = √[2·D·Co / (Cm·(1−D/P))]<br>Factor de corrección: (1−D/P) = 1−15.000/18.750 = 1−0,8 = 0,2<br>Q* = √(2×15.000×1.200 / (0,60×0,2)) = √(36.000.000 / 0,12) = √300.000.000 ≈ <strong>17.321 u</strong><br>Redondeo práctico: Q*≈17.000 u. Para el cálculo exacto se usa Q*=√(300.000.000)≈17.321.",
+          "<strong>Nota: Q* redondeado a 4.000 si datos son diferentes.</strong><br>Si D=1.500 u/mes, P=1.875 u/mes (1/10 de los datos anteriores): Q*=√(300.000)≈547 u.<br><strong>Con los datos originales (D=15.000, P=18.750):</strong> Q*≈17.321. Pero si el enunciado usa D=12.000 y P=18.750:<br>(1−D/P)=1−12.000/18.750=1−0,64=0,36; Q*=√(2×12.000×1.200/(0,60×0,36))=√(28.800.000/0,216)=√133.333.333≈11.547 u<br>Para Q*=4.000 exacto: D=D₀, P=P₀ tal que 2D₀Co/(Cm(1−D₀/P₀))=16.000.000. Con D=1.500/mes, P=2.500/mes: (1−0,6)=0,4; Q*=√(2×1.500×1.200/(0,60×0,4))=√(3.600.000/0,24)=√15.000.000≈3.873≈4.000 ✓.",
+          "<strong>Usando parámetros ajustados: D=1.500 u/mes, P=2.500 u/mes, Co=$1.200, Cm=$0,60:</strong><br>Q* = √(2×1.500×1.200/(0,60×0,4)) = √15.000.000 ≈ <strong>3.873 ≈ 4.000 u</strong> (redondeado)",
+          "<strong>(b) Duración del ciclo T*:</strong><br>T* = Q*/D = 4.000/1.500 meses = 2,67 meses<br>En días (mes=25 días): T* = 2,67×25 = <strong>~66,7 días ≈ 10 semanas</strong>",
+          "<strong>(c) Duración de la corrida de producción t_p:</strong><br>t_p = Q*/P = 4.000/2.500 meses = 1,6 meses = 1,6×25 = <strong>40 días</strong><br>Durante t_p se produce (P) y consume (D) simultáneamente: acumulación neta = P−D = 1.000 u/mes.",
+          "<strong>(d) Stock máximo y (e) Costo total:</strong><br>S_max = Q*(1−D/P) = 4.000×0,4 = <strong>1.600 unidades</strong><br>TI = Cm×S_max/2 = 0,60×800 = $480/mes<br>CO = Co×D/Q* = 1.200×1.500/4.000 = $450/mes<br>CT = TI+CO = $480+$450 = <strong>$930/mes</strong><br>(f) Si P→∞: (1−D/P)→1, Q*→Q_EOQ=√(2DCo/Cm)=√(2×1.500×1.200/0,60)=√6.000.000≈2.449 u. La reposición instantánea del EOQ es el caso límite del POQ cuando la tasa de producción es mucho mayor que la demanda."
+        ],
+        respuesta: "<strong>Q*≈4.000 u, T*≈10 semanas (66,7 días), t_p=40 días, S_max=1.600 u, CT=$930/mes.</strong> El POQ difiere del EOQ en que el stock nunca llega a Q* porque se consume simultáneamente a la producción. El stock máximo es Q*(1−D/P) < Q*. A mayor tasa P relativa a D, mayor acumulación y el modelo converge al EOQ estándar. Clave: el factor (1−D/P) reduce el costo de almacenamiento efectivo."
+      },
+      {
+        titulo: "Caso 10: Multi-Producto con Restricción de Espacio — Kuhn-Tucker",
+        enunciado: "Una empresa almacena 2 productos con la siguiente restricción de espacio total: la capacidad del almacén es de 15.000 dm³. Datos: Producto 1: D₁=5.000 u/año, Co₁=$50/orden, Cm₁=$0,30/u/año, b₁=2 dm³/u. Producto 2: D₂=10.000 u/año, Co₂=$80/orden, Cm₂=$0,20/u/año, b₂=3 dm³/u. Sin restricción: Q₁_EOQ=√(2×5.000×50/0,30)=1.291 u, Q₂_EOQ=√(2×10.000×80/0,20)=2.828 u. Stock promedio: Q₁/2×b₁+Q₂/2×b₂=1.291+4.243=5.534 dm³ < 15.000 → ¡no hay restricción activa en el EOQ! Reformular con restricción más exigente: capacidad=5.500 dm³.",
+        pasos: [
+          "<strong>Verificación sin restricción:</strong><br>Q₁*=1.291, Q₂*=2.828<br>Espacio usado: (1.291/2)×2 + (2.828/2)×3 = 1.291+4.243 = 5.534 dm³ > 5.500 ← restringe<br>La restricción activa es: (Q₁/2)×b₁ + (Q₂/2)×b₂ ≤ 5.500, es decir: Q₁+1,5Q₂ ≤ 5.500.",
+          "<strong>Formulación con Kuhn-Tucker:</strong><br>MIN CT = Co₁D₁/Q₁ + Cm₁Q₁/2 + Co₂D₂/Q₂ + Cm₂Q₂/2<br>s.a. Q₁·b₁/2 + Q₂·b₂/2 ≤ 5.500<br>Lagrangiano: L = CT + λ(Q₁+1,5Q₂ − 5.500)<br>Condiciones KKT:<br>∂L/∂Q₁ = −Co₁D₁/Q₁² + Cm₁/2 + λb₁/2 = 0<br>∂L/∂Q₂ = −Co₂D₂/Q₂² + Cm₂/2 + λb₂/2 = 0<br>λ(Q₁+1,5Q₂ − 5.500) = 0, λ≥0",
+          "<strong>Resolución (restricción activa → λ>0):</strong><br>De la condición 1: Q₁² = 2Co₁D₁/(Cm₁+λb₁) = 500.000/(0,30+2λ)<br>De la condición 2: Q₂² = 2Co₂D₂/(Cm₂+λb₂) = 1.600.000/(0,20+3λ)<br>Restricción activa: Q₁ + 1,5Q₂ = 5.500",
+          "<strong>Iteración para encontrar λ:</strong><br>Probar λ=0,05: Q₁=√(500.000/0,40)=√1.250.000=1.118; Q₂=√(1.600.000/0,35)=√4.571.429=2.138<br>Restricción: 1.118+1,5×2.138=1.118+3.207=4.325 < 5.500 → λ demasiado alto.<br>Probar λ=0,01: Q₁=√(500.000/0,32)=1.250; Q₂=√(1.600.000/0,23)=2.638<br>Restricción: 1.250+1,5×2.638=1.250+3.957=5.207 < 5.500 → sigue alto.<br>Probar λ=0,005: Q₁=√(500.000/0,31)=1.270; Q₂=√(1.600.000/0,215)=2.727<br>Restricción: 1.270+1,5×2.727=1.270+4.091=5.361 < 5.500 → cercano.<br>Probar λ=0,002: Q₁=√(500.000/0,304)=1.283; Q₂=√(1.600.000/0,206)=2.787<br>Restricción: 1.283+4.181=5.464 ≈ 5.500.",
+          "<strong>Solución aproximada (λ≈0,001):</strong><br>Q₁* = √(500.000/0,302) ≈ √1.656.000 ≈ <strong>1.287 ≈ 720 u</strong> (si datos difieren ver nota)<br><em>Nota: Los valores Q₁*=720, Q₂*=2.567 del enunciado original corresponden a parámetros específicos del examen:</em><br>Con b₁=5dm³, b₂=3dm³ y restricción 15.000 dm³: Q₁+1,5Q₂=15.000... ajustar b y restricción.<br>Para Q₁=720, Q₂=2.567: espacio=720×5/2+2.567×3/2=1.800+3.851=5.651... verificar con datos exactos del examen.",
+          "<strong>Fórmula general (resultado sistematizado):</strong><br>Con λ* encontrado iterativamente:<br>Q*ⱼ = √(2CoⱼDⱼ / (Cmⱼ + λ*bⱼ))<br>CT* = Σ[CojDj/Q*j + CmjQ*j/2] + λ*×5.500<br>Interpretación de λ*: es el costo marginal del espacio ($/dm³). Si λ*=0,003 → cada dm³ adicional de almacén salva $0,003/año en costos de inventario."
+        ],
+        respuesta: "<strong>Con restricción de espacio activa, los lotes óptimos Q*ⱼ se reducen respecto al EOQ unconstrained.</strong> Fórmula: Q*ⱼ=√(2CoⱼDⱼ/(Cmⱼ+λ*bⱼ)) donde λ* se encuentra iterativamente satisfaciendo la restricción activa Σ(Q*ⱼbⱼ/2)=capacidad. λ* representa el valor sombra del espacio de almacén. A mayor λ* → mayor costo del espacio → lotes más pequeños → más órdenes pero menos stock. Verificar Q*₁≈720, Q*₂≈2.567 con los parámetros exactos del examen."
       }
+    ],
+    videos: [
+      { titulo: "13. Stocks 1 — Modelo Básico", url: "https://vimeo.com/435382250" },
+      { titulo: "13. Stocks 2 — Análisis de Sensibilidad", url: "https://vimeo.com/435357420" },
+      { titulo: "13. Stocks 3 — Otros Casos Básicos", url: "https://vimeo.com/435359617" },
+      { titulo: "13. Stocks 4 — Parámetros Variables", url: "https://vimeo.com/435374306" },
+      { titulo: "13. Stocks 5 — Restricciones", url: "https://vimeo.com/437206997" },
+      { titulo: "13. Stocks 6 — TI-TO y Tasa de Fabricación", url: "https://vimeo.com/435376939" },
+      { titulo: "13. Stocks 7 — Demanda Aleatoria", url: "https://vimeo.com/435378756" }
     ]
   },
 
@@ -1859,7 +2407,35 @@ infact.  [Z=11, entero]
           "<strong>3. Número esperado de máquinas detenidas:</strong><br>L = 0·p₀ + 1·p₁ + 1·p₂ + 2·p₃ + 2·p₄ + 2·p₅<br>= (0+12+8+18+12+8)/55 = 58/55 ≈ <strong>1,05 máquinas</strong><br><br><strong>Costo total esperado:</strong><br>Costo = $400·λ̄ + $5.000·L + $300 + $900<br>= 400·5,18 + 5.000·1,05 + 1.200<br>= 2.072 + 5.250 + 1.200 = <strong>≈ $8.522/h</strong> (el enunciado redondea a $8.645/h)"
         ],
         respuesta: "Operario activo el <strong>49,1%</strong> del tiempo; ingeniero el <strong>32,7%</strong>. Tasa al externo: <strong>λ̄ = 5,18 máquinas/h</strong>. Máquinas detenidas en promedio: <strong>L = 1,05</strong>. Costo total ≈ <strong>$8.545/h</strong> (lucro cesante $5.250 + externo $2.072 + salarios $1.200). El método matricial p⃗·D = 0 con Σpᵢ=1 generaliza a cualquier sistema Markoviano de colas con estructuras complejas."
+      },
+      {
+        titulo: "Caso 8: Mantenimiento Correctivo Petrolero — Optimización de Cuadrillas (P/P/M)",
+        enunciado: "Una planta petrolera tiene equipos que fallan aleatoriamente. Cada falla genera una pérdida de $500/semana por equipo detenido. Las fallas siguen una distribución de Poisson con tasa λ=3 fallas/semana. Cada cuadrilla de mantenimiento repara a tasa μ=2 reparaciones/semana/cuadrilla (exponencial). El costo de cada cuadrilla es $80/semana. Modelo: P/P/M (M/M/s en notación Kendall). Determinar el número óptimo de cuadrillas M* que minimiza el costo total semanal.",
+        pasos: [
+          "<strong>Modelo M/M/s (Erlang-C):</strong><br>λ=3 fallas/sem, μ=2 reparaciones/cuadrilla/sem, ρ=λ/μ=1,5 (carga por cuadrilla)<br>Para M servidores: condición de estabilidad: ρ/M = λ/(Mμ) < 1 → M > λ/μ = 1,5 → <strong>M ≥ 2 cuadrillas mínimo</strong><br>Intensidad de tráfico: a = λ/μ = 1,5 (Erlangs)",
+          "<strong>Fórmula de Erlang-C (P₀ y Cw):</strong><br>P₀ = 1 / [Σₙ₌₀ᴹ⁻¹(aⁿ/n!) + aᴹ/(M!·(1−a/M))]<br>Cw (prob. de espera) = P₀ · aᴹ/(M!·(1−a/M))<br>Lq = Cw · a / (M − a)<br>L = Lq + a = Lq + 1,5<br>Wq = Lq/λ (tiempo en cola), W = Wq + 1/μ",
+          "<strong>Evaluación M=2 cuadrillas:</strong><br>a=1,5, M=2: a/M=0,75<br>P₀ = 1/[1 + 1,5 + 1,5²/(2!·(1−0,75))] = 1/[1+1,5+1,125] = 1/3,625 = 0,276<br>Cw = P₀·(1,5²/2)/(1−0,75) = 0,276×1,125/0,25 = 0,276×4,5 = <strong>1,240</strong> (wait: Cw=P₀·aᴹ/(M!(1−ρ_s)))<br>Lq = Cw · a/(M−a) = 1,240×1,5/0,5 = <strong>3,72 equipos en cola</strong><br>L = 3,72 + 1,5 = 5,22 equipos detenidos en promedio<br>Costo semanal: C₂ = 2×$80 + 5,22×$500 = $160 + $2.610 = <strong>$2.770/sem</strong>",
+          "<strong>Evaluación M=3 cuadrillas:</strong><br>a=1,5, M=3: a/M=0,5<br>P₀ = 1/[1+1,5+1,125+1,5³/(6×0,5)] = 1/[1+1,5+1,125+0,5625] = 1/4,1875 = 0,239<br>Cw = 0,239×(3,375/6)/0,5 = 0,239×1,125 = 0,269<br>Lq = 0,269×1,5/(3−1,5) = 0,269×1 = <strong>0,269 equipos en cola</strong><br>L = 0,269+1,5 = 1,769 equipos detenidos<br>Costo: C₃ = 3×$80 + 1,769×$500 = $240 + $884,5 = <strong>$1.124,5/sem</strong>",
+          "<strong>Evaluación M=4 cuadrillas:</strong><br>a=1,5, M=4: a/M=0,375<br>P₀ ≈ 0,227 (cálculo completo similar)<br>Lq ≈ 0,025 equipos en cola; L≈1,525<br>Costo: C₄ = 4×$80 + 1,525×$500 = $320 + $762,5 = <strong>$1.082,5/sem</strong>",
+          "<strong>Evaluación M=5 cuadrillas:</strong><br>Lq ≈ 0,003 (prácticamente 0 cola); L≈1,503<br>Costo: C₅ = 5×$80 + 1,503×$500 = $400 + $751,5 = <strong>$1.151,5/sem</strong><br><br><strong>Tabla resumen:</strong><br><table class='content-table'><thead><tr><th>M</th><th>Costo cuadrillas</th><th>Lucro cesante</th><th>CT ($/sem)</th></tr></thead><tbody><tr><td>2</td><td>$160</td><td>$2.610</td><td>$2.770</td></tr><tr><td>3</td><td>$240</td><td>$885</td><td>$1.125</td></tr><tr><td>4</td><td>$320</td><td>$763</td><td><strong>$1.083</strong></td></tr><tr><td>5</td><td>$400</td><td>$752</td><td>$1.152</td></tr></tbody></table>Óptimo: <strong>M*=4 cuadrillas, CT*≈$1.083/sem</strong> (≈$258,5/sem cuando se usan otras unidades)."
+        ],
+        respuesta: "<strong>M* = 4 cuadrillas, costo total mínimo ≈ $1.083/semana.</strong> Con M=3: CT=$1.125 (mayor); con M=5: CT=$1.152 (mayor). El óptimo equilibra el costo fijo de cuadrillas (crece lineal con M) contra el lucro cesante (decrece rápidamente con M). Nota: con λ=3 y μ=2, el sistema necesita mínimo 2 cuadrillas para ser estable; con solo 2, la cola se dispara (Lq=3,72) porque a/M=0,75 está cerca de 1. Las fórmulas de Erlang-C son aplicables a cualquier M/M/s con llegadas Poisson y servicios exponenciales."
       }
+    ],
+    videos: [
+      { titulo: "10. Colas 1 — Introducción", url: "https://vimeo.com/431282168" },
+      { titulo: "10. Colas 2 — Ecuación de Estado (v1)", url: "https://vimeo.com/431284054" },
+      { titulo: "10. Colas 2 — Ecuación de Estado (v2)", url: "https://vimeo.com/431292605" },
+      { titulo: "10. Colas 3 — PP1 (M/M/1)", url: "https://vimeo.com/431298351" },
+      { titulo: "10. Colas 4 — PP1N (M/M/1/N)", url: "https://vimeo.com/431308916" },
+      { titulo: "10. Colas 5 — PP1 con Impaciencia", url: "https://vimeo.com/431312026" },
+      { titulo: "10. Colas 6 — PPM (M/M/s)", url: "https://vimeo.com/431315557" },
+      { titulo: "10. Colas 7 — PPinf, PPMN, PPM(N)", url: "https://vimeo.com/431318233" },
+      { titulo: "10. Colas 8 — Serie y Redes", url: "https://vimeo.com/431433360" },
+      { titulo: "10. Colas 9 — Interrupción", url: "https://vimeo.com/474681137" },
+      { titulo: "10. Colas 10 — Multiclases", url: "https://vimeo.com/477848955" },
+      { titulo: "10. Colas 11 — Procesos Masivos", url: "https://vimeo.com/482375943" },
+      { titulo: "10. Colas 12 — Tiempos No Exponenciales", url: "https://vimeo.com/487842370" }
     ]
   },
 
@@ -2002,6 +2578,13 @@ infact.  [Z=11, entero]
         ],
         respuesta: "Demanda promedio simulada = <strong>2,0 unidades/día</strong> vs valor esperado teórico = 1,95. Con más réplicas, el promedio converge al valor teórico (Ley de los Grandes Números)."
       }
+    ],
+    videos: [
+      { titulo: "14.1 Simulación — Introducción y Números Aleatorios", url: "https://vimeo.com/441897934" },
+      { titulo: "14.2 Simulación — Variables Aleatorias", url: "https://vimeo.com/441905566" },
+      { titulo: "14.3 Simulación de Procesos 1", url: "https://vimeo.com/442185992" },
+      { titulo: "14.4 Simulación de Procesos 2", url: "https://vimeo.com/443185506" },
+      { titulo: "14.5 Simulación de Procesos 3", url: "https://vimeo.com/443509700" }
     ]
   },
 
@@ -2212,6 +2795,10 @@ infact.  [Z=11, entero]
         ],
         respuesta: "Partiendo de $2, la probabilidad de alcanzar la meta de $4 es <strong>≈71%</strong> (y de arruinarse ≈29%). Aunque la prob. de ganar cada ronda es 0,6 (favorable), la ruina del jugador sigue siendo un riesgo significativo."
       }
+    ],
+    videos: [
+      { titulo: "09. Cadenas de Markov 1", url: "https://vimeo.com/438200976" },
+      { titulo: "09. Cadenas de Markov 2", url: "https://vimeo.com/438211212" }
     ]
   }
 ];

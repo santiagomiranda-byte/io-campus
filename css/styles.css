@@ -807,26 +807,43 @@ input, textarea { font-family: inherit; }
 }
 
 /* ---- Formula Boxes ---- */
-.formula-highlight, .formula-box {
-  background: linear-gradient(135deg, #fffbeb, #fef3c7);
-  border: 1.5px solid #fcd34d;
-  border-left: 4px solid var(--amber);
+.formula-highlight {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid var(--blue);
   border-radius: var(--radius);
-  padding: 16px 20px;
+  padding: 16px 22px;
   margin: 18px 0;
-  font-family: 'Courier New', 'Cascadia Code', monospace;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+.formula-box {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin: 16px 0;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  line-height: 1.8;
-  color: #92400e;
+  line-height: 1.85;
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .formula-box strong {
   display: block;
-  font-size: 13px;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #b45309;
-  margin-bottom: 6px;
+  letter-spacing: 0.07em;
+  color: var(--blue);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 /* ---- Steps ---- */
@@ -893,7 +910,110 @@ input, textarea { font-family: inherit; }
   background: var(--bg);
 }
 
-.simplex-table .obj-row { background: #fef3c7; font-weight: 700; }
+.simplex-table .obj-row   { background: #fefce8; font-weight: 700; }
+.simplex-table .pivot-col { background: #dbeafe; font-weight: 700; color: #1d4ed8; }
+.simplex-table .pivot-row td { background: #dcfce7 !important; }
+.simplex-table .pivot-cell { background: #166534 !important; color: white !important; font-weight: 900; border-radius: 4px; }
+.simplex-table .entering  { color: #1d4ed8; font-weight: 800; }
+.simplex-table .leaving   { color: #b91c1c; font-weight: 800; }
+
+/* Formato tabla de cátedra (ck/xk/Bk/bi-aij) */
+.simplex-table { font-family: monospace; font-size: 13px; width: auto !important; }
+.simplex-table td { text-align: center; min-width: 40px; padding: 5px 10px !important; white-space: nowrap; }
+.simplex-table .cj-row td    { background: #e8f0fe; color: #555; font-size: 11px; border: 1px solid #c5d4f5; }
+.simplex-table .header-row td{ background: #f0f0f0; font-weight: 700; border: 1px solid #ccc; }
+.simplex-table .z-row td     { background: #fef3c7; font-weight: 700; border: 1px solid #f0d060; }
+.simplex-table .pivot        { background: #dcfce7 !important; outline: 2px solid #16a34a; font-weight: 700; }
+.simplex-table tbody tr:hover { background: transparent; }
+
+/* ---- Content Tabs (section switcher) ---- */
+.content-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 14px 24px;
+  background: white;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  scrollbar-width: none;
+}
+.content-tabs::-webkit-scrollbar { display: none; }
+.content-tab {
+  padding: 7px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.16s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.content-tab:hover { border-color: var(--unit-accent, var(--blue)); color: var(--unit-accent, var(--blue)); }
+.content-tab.active {
+  background: var(--unit-accent, var(--blue));
+  border-color: var(--unit-accent, var(--blue));
+  color: white;
+}
+
+/* ---- Casos CTA ---- */
+.casos-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #dbeafe, #ede9fe);
+  border: 1.5px solid #bfdbfe;
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin: 32px 0 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.casos-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(59,130,246,0.15); }
+.casos-cta-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--blue); margin-bottom: 4px; }
+.casos-cta-title { font-size: 17px; font-weight: 700; color: #1e3a5f; }
+.casos-cta-sub { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+.casos-cta-arrow { font-size: 24px; color: var(--blue); font-weight: 700; }
+
+/* ---- Guía highlight boxes ---- */
+.guia-tip {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #16a34a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.guia-warning {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-left: 4px solid #ea580c;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.mechanic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+.mechanic-card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-top: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.mechanic-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--navy); }
+.mechanic-card ul { padding-left: 16px; }
+.mechanic-card li { font-size: 13px; color: var(--text-2); margin-bottom: 4px; line-height: 1.5; }
 
 /* ---- ASCII Tree ---- */
 .ascii-tree {

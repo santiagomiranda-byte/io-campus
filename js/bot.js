@@ -19,7 +19,7 @@ const BOT_RESPONSES = [
 **Condición de optimalidad (MAX):** todos los valores en la fila Z son ≥ 0`
   },
   {
-    keywords: ["pert", "cpm", "crítico", "camino", "red", "nodo", "actividad", "proyecto", "te", "tl", "margen"],
+    keywords: ["pert", "cpm", "camino crítico", "crítico", "nodo", "actividad", "proyecto", "forward", "backward", "tiempo esperado", "margen total"],
     title: "PERT / CPM",
     response: `**PERT/CPM** son técnicas de redes para gestión de proyectos.
 
@@ -148,17 +148,47 @@ Si el precio sombra de un recurso es 0 → el recurso no es restrictivo (tiene h
   }
 ];
 
-const DEFAULT_RESPONSE = `No encontré información específica para esa pregunta.
+const DEFAULT_RESPONSE = `No pude conectar con la IA en este momento.
 
-**Podés intentar:**
-- Reformular con más detalle
-- Adjuntar tu guía como **PDF** usando el clip 📎
-- Subir una **imagen** de un ejercicio o cuadro
-- Usar los botones rápidos abajo`;
+**Para que funcione la IA:**
+1. Hacé clic en el botón de enviar de nuevo
+2. Si aparece un popup de Puter → aceptalo (es la cuenta gratis de IA)
+3. Si no aparece nada → permitir popups para este sitio en tu navegador
+
+Mientras tanto podés usar los botones rápidos de abajo para respuestas básicas.`;
 
 // ---- State ----
 let conversationHistory = [];
 let pendingAttachment = null;
+let _puterReady = false;
+let _puterLoading = false;
+
+async function ensurePuter() {
+  if (_puterReady && window.puter) return;
+  if (window.puter) { _puterReady = true; return; }
+
+  if (_puterLoading) {
+    // Wait for the existing load attempt
+    await new Promise((resolve) => {
+      const check = setInterval(() => {
+        if (window.puter || _puterReady) { clearInterval(check); resolve(); }
+      }, 200);
+      setTimeout(() => { clearInterval(check); resolve(); }, 12000);
+    });
+    if (!window.puter) throw new Error('La IA no cargó. Recargá la página y permitir popups si te lo pide.');
+    _puterReady = true;
+    return;
+  }
+
+  _puterLoading = true;
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('timeout')), 12000);
+    if (window.puter) { clearTimeout(timeout); resolve(); return; }
+    window.addEventListener('puterloaded', () => { clearTimeout(timeout); resolve(); }, { once: true });
+  });
+  _puterLoading = false;
+  _puterReady = true;
+}
 
 // ---- DOM ----
 let chatMessages, chatInput, sendBtn, botPanel, botToggle;
@@ -205,16 +235,24 @@ function initBot() {
     });
   });
 
+  // Try to load Puter.js and update status
+  const statusEl = document.querySelector('.bot-status');
+  if (statusEl) statusEl.textContent = '🟡 Conectando IA…';
+  ensurePuter()
+    .then(() => { if (statusEl) statusEl.textContent = '🟢 IA lista — gratis'; })
+    .catch(() => { if (statusEl) statusEl.textContent = '⚠️ IA no disponible — recargá'; });
+
   setTimeout(() => {
-    addMessage('bot', `¡Hola! Soy tu asistente de **Investigación Operativa**.
+    addMessage('bot', `¡Hola! Soy tu asistente de **Investigación Operativa** con IA gratuita.
 
 Podés:
-- Preguntarme sobre **cualquier tema** de IO o lo que necesites
+- Preguntarme sobre **cualquier tema** de IO o lo que quieras
 - Adjuntar tu **guía en PDF** con el clip 📎
-- Subir una **imagen** de un ejercicio o cuadro
-- Pegar un **link de YouTube** para referenciarlo
+- Subir una **imagen** de un ejercicio y preguntarme sobre ella
+- Usar el botón 📸 para **capturar** cualquier parte de la guía en pantalla
+- Pegar un **link de YouTube**
 
-La primera vez que uses la IA te va a pedir crear una cuenta gratuita en Puter. ¿Qué querés repasar hoy?`);
+_La primera vez que mandes un mensaje puede aparecer un popup de login gratuito en Puter.com — aceptalo para activar la IA._ ¿Qué querés repasar?`);
   }, 500);
 }
 
@@ -443,8 +481,16 @@ async function handleSend() {
     addMessage('bot', response);
   } catch (err) {
     removeTyping(typingId);
-    console.warn('AI error, usando fallback:', err);
-    addMessage('bot', userText ? getPreProgrammedResponse(userText) : DEFAULT_RESPONSE);
+    console.warn('AI error:', err);
+    const errMsg = err?.message || 'Error desconocido';
+    const isPuterError = errMsg.includes('popup') || errMsg.includes('Puter') || errMsg.includes('puter') || errMsg.includes('disponible') || errMsg.includes('timeout');
+    if (isPuterError) {
+      addMessage('bot', `⚠️ **No se pudo conectar con la IA.**\n\n${errMsg}\n\n💡 **Qué hacer:**\n- Permitir popups para este sitio\n- Recargar la página con **Ctrl+Shift+R** (Win) o **Cmd+Shift+R** (Mac)\n- Si aparece un popup de Puter.com → aceptalo para activar la IA gratuita`);
+    } else {
+      addMessage('bot', `⚠️ Error de IA: ${errMsg}`);
+    }
+    const statusEl = document.querySelector('.bot-status');
+    if (statusEl) statusEl.textContent = '⚠️ Error de IA — reintentá';
   } finally {
     sendBtn.disabled = false;
   }
@@ -452,7 +498,8 @@ async function handleSend() {
 
 // ---- Puter.js AI ----
 async function sendToAI(userText, attachment) {
-  if (!window.puter) throw new Error('puter no disponible');
+  await ensurePuter();
+  if (!window.puter) throw new Error('La IA (Puter) no está disponible. Recargá la página con Ctrl+Shift+R y permitir popups si te lo pide.');
 
   let userContent;
 
